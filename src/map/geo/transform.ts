@@ -96,10 +96,10 @@ class Transform {
       matrix.f = dy / matrix.d
       this._ctx.translate(matrix.e, matrix.f);
     }
-    // ctx.save();
-    // ctx.setTransform(1,0,0,1,0,0);
-    // ctx.clearRect(0, 0, this.width, this.height);
-    // ctx.restore()
+    ctx.save();
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.clearRect(0, 0, this.width, this.height);
+    ctx.restore()
     this.updateVisualBound()
     return matrix;
   }

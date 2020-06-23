@@ -53,7 +53,7 @@ export default class TitleSource {
     myHeaders.append("authority", "tile.openstreetmap.org");
     myHeaders.append("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.45 Safari/537.36 Edg/84.0.522.20");
 
-    const url = `http://localhost:9999/map/rizhao/google/${z}/${x}/${y}.jpeg`
+    const url = `http://localhost:39999/map/rizhao/google/${z}/${x}/${y}.jpeg`
     return new window.Request(url, {
       method: 'GET',
       mode: 'cors',

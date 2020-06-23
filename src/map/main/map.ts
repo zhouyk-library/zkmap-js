@@ -44,6 +44,7 @@ class Map extends Camera {
     this.resize();
     this._render = render;
     this.triggerRepaint()
+    this.on('refresh', this.triggerRepaint)
   }
 
   resize(eventData?: Object) {
@@ -94,7 +95,10 @@ class Map extends Camera {
   }
   triggerRepaint() {
     this._frame = bindRAFrame((paintStartTimeStamp: number) => {
+      this._frame = null;
       this._render.render();
+      this.triggerRepaint()
+      return this
     });
   }
 }
