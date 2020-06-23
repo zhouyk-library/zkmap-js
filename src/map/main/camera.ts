@@ -56,7 +56,7 @@ class Camera extends Evented {
   }
   matrixRender(option: any): void {
     this.transform.matrix(option)
-    this.render.render()
+    this.render.computed()
     // this.render.drawLngLatLine()
   }
   getCenter(): LngLat { return new LngLat(this.transform.center.lng, this.transform.center.lat); }

@@ -27,6 +27,9 @@ export default class Render {
     ctx.restore();
     this._painter.render();
   }
+  computed() {
+    this._painter.computed();
+  }
   // drawLngLatLine() {
   //   const ctx = this._ctx
   //   const screenBound: Bound = this._transform.screenBound
