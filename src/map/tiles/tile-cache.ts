@@ -40,7 +40,7 @@ export default class TilesCache {
       if(tileTmp.isLoaded){
         tile = tileTmp
       }else{
-        return null;
+        // return null;
         const keys:Array<String> = tileTmp.getParentKeys()
         for (let index = 0; index < keys.length; index++) {
           const key = keys[index];
