@@ -1,8 +1,8 @@
 import Camera from './camera';
 import { MapOptions, Event, Cancelable } from './types';
-import { bindRAFrame } from './util';
 import { Transform } from '../geo/types';
 import { Render } from '../render/types';
+import Utils from '../utils'
 
 class Map extends Camera {
   private _container: HTMLElement;
@@ -94,7 +94,7 @@ class Map extends Camera {
     this._canvas.removeEventListener("wheel", this._onWheel);
   }
   triggerRepaint() {
-    this._frame = bindRAFrame((paintStartTimeStamp: number) => {
+    this._frame = Utils.Browser.requestAnimationFrame((paintStartTimeStamp: number) => {
       this._frame = null;
       this._render.render();
       this.triggerRepaint()

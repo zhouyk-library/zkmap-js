@@ -22,6 +22,7 @@ class Transform {
   private _ctx: CanvasRenderingContext2D;
   private _context: Context;
   private _canvas?: HTMLCanvasElement
+  private _matrix: Array<number>
 
 
   constructor(canvas?: HTMLCanvasElement, minZoom?: number, maxZoom?: number, type?: string) {
@@ -41,6 +42,7 @@ class Transform {
       this._ctx = canvas.getContext("2d")
       this._context = new Context(this._ctx);
     }
+    this._matrix = [256 * Math.pow(2, this._zoom) / (this._bound.xmax - this._bound.xmin) * this._bound.xscale, 0, 0, 256 * Math.pow(2, this._zoom) / (this._bound.ymax - this._bound.ymin) * this._bound.yscale, this.width / 2, this.height / 2]
 
     //设置初始矩阵，由于地图切片是256*256，Math.pow(2, this._zoom)代表在一定缩放级别下x与y轴的切片数量
     this._ctx.setTransform(256 * Math.pow(2, this._zoom) / (this._bound.xmax - this._bound.xmin) * this._bound.xscale, 0, 0, 256 * Math.pow(2, this._zoom) / (this._bound.ymax - this._bound.ymin) * this._bound.yscale, this.width / 2, this.height / 2);

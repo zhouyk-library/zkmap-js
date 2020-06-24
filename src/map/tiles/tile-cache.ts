@@ -29,6 +29,9 @@ export default class TilesCache {
     loadedTiles.sort(function(a:Tile, b:Tile){return a.zoom - b.zoom})
     return loadedTiles
   }
+  isAllFinishToZoom(z: number):boolean{
+    return this._tiles.filter(tile=> tile.zoom === z && !tile.isFinish).length === 0
+  }
   private getLoadTile(z: number, x: number, y: number):Tile{
     let tile:Tile = null
     const key:string = `${z}-${x}-${y}`

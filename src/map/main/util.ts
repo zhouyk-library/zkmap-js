@@ -14,14 +14,3 @@ export function bindAll(fns: Array<string>, context: Object): void {
     context[fn] = context[fn].bind(context);
   });
 }
-
-// @ts-ignore
-const raf = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
-
-// @ts-ignore
-const cancel = window.cancelAnimationFrame || window.mozCancelAnimationFrame || window.webkitCancelAnimationFrame || window.msCancelAnimationFrame;
-
-export function bindRAFrame(fn: (paintStartTimestamp: number) => void): Cancelable {
-  const frame = raf(fn);
-  return { cancel: () => cancel(frame) };
-}
