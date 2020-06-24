@@ -59,7 +59,7 @@ export default class Painter {
       ctx.lineWidth = 1
       ctx.rect(screenX, screenY, width, width);
       ctx.font = `${30}px Verdana`;
-      ctx.fillText(`(${this._transform.zoom},${item.x},${item.y})`, screenX + width/2 - 100, screenY + width/2 - 15, 200);
+      ctx.fillText(`(${item.zoom},${item.x},${item.y})`, screenX + width/2 - 100, screenY + width/2 - 15, 200);
       ctx.closePath()
       ctx.stroke();
     })
