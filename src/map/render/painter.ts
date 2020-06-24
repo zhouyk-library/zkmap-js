@@ -27,7 +27,9 @@ export default class Painter {
     var yend = Math.ceil(allCount / countY * (Math.min(inYEnd, outYEnd) - inYStart))
     for (let inexx = xstart; inexx < xend; inexx++) {
       for (let inexy = ystart; inexy < yend; inexy++) {
-        this._tilesCache.add(this._transform.zoom,inexx,inexy,`http://localhost:39999/map/rizhao/google/${this._transform.zoom}/${inexx}/${inexy}.jpeg`)
+        // this._tilesCache.add(this._transform.zoom,inexx,inexy,`http://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${this._transform.zoom}/${inexy}/${inexx}`)
+        // this._tilesCache.add(this._transform.zoom,inexx,inexy,`http://localhost:39999/map/rizhao/google/${this._transform.zoom}/${inexx}/${inexy}.jpeg`)
+        this._tilesCache.add(this._transform.zoom,inexx,inexy,`http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x=${inexx}&y=${inexy}&z=${this._transform.zoom}`)
         // this._tilesCache.add(this._transform.zoom,inexx,inexy,`https://tile.openstreetmap.org/${this._transform.zoom}/${inexx}/${inexy}.png`)
         // this._tilesCache.add(this._transform.zoom,inexx,inexy,`http://webrd01.is.autonavi.com/appmaptile?x=${inexx}&y=${inexy}&z=${this._transform.zoom}&lang=zh_cn&size=1&scale=1&style=8`)
       }
