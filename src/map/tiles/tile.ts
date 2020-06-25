@@ -42,6 +42,7 @@ export default class Tile {
     return this._x * jie < x && x < (this._x+1) * jie -1 && this._y * jie < y && y < (this._y+1) * jie -1
   }
   get isLoaded():Boolean{return this._state === TileState.OK}
+  get isFinish():Boolean{return this._state === TileState.OK || this._state === TileState.ERROR}
   get state():TileState {return this._state}
   get zoom():number {return this._z}
   get x():number {return this._x}
