@@ -2,6 +2,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { CleanWebpackPlugin }  = require('clean-webpack-plugin')
 const webpack = require('webpack')
 const path = require("path")
+const port = 10248
+const BuildDonePlugin = require('./plugins/BuildDonePlugin')
 //使用node的模块
 module.exports = {
     //这就是我们项目编译的入口文件
@@ -34,14 +36,20 @@ module.exports = {
     //这个参数就可以在webpack中获取到了
     devtool: 'inline-source-map',
     devServer:{
+        open: true,
         //这个本地开发环境运行时是基于哪个文件夹作为根目录
         contentBase:'./dist/test',
         //当你有错误的时候在控制台打出
         stats: 'errors-only',
+        overlay: {
+          warnings: true,
+          errors: true
+        },
         //不启动压缩
         compress: true,
+        hot: true,
         host: 'localhost',
-        port: 10248
+        port: port
     },
     //这里就是一些插件
     plugins:[
@@ -51,6 +59,7 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: './template/index.html'
         }),
-        new webpack.HotModuleReplacementPlugin()
+        new webpack.HotModuleReplacementPlugin(),
+        new BuildDonePlugin(()=>{console.log(`\n \n> Address:http://localhost:${port}`)})
     ]
 }

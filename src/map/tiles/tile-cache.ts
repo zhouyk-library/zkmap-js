@@ -7,6 +7,11 @@ export default class TilesCache {
     this._key2tile = new Map();
   }
   loadTiles(){
+    // const values:IterableIterator<Tile> = this._key2tile.values()
+    // const t:Tile = values.next()
+    // if(t && t.state === TileState.NONE){
+    //   t.load()
+    // }
     this._tiles.filter((item:Tile)=>item.state === TileState.NONE).forEach((item:Tile)=>{
       item.load()
     })
@@ -40,7 +45,6 @@ export default class TilesCache {
       if(tileTmp.isLoaded){
         tile = tileTmp
       }else{
-        // return null;
         const keys:Array<String> = tileTmp.getParentKeys()
         for (let index = 0; index < keys.length; index++) {
           const key = keys[index];
