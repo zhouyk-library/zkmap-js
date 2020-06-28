@@ -14,3 +14,13 @@ export function requestAnimationFrame(fn: (paintStartTimestamp: number) => void)
   const frame = raf(fn);
   return { cancel: () => cancel(frame) };
 }
+
+
+let supportsOffscreenCanvas: boolean;
+
+export function offscreenCanvasSupported(): boolean {
+  if (supportsOffscreenCanvas == null) {
+    supportsOffscreenCanvas = window.OffscreenCanvas && new window.OffscreenCanvas(1, 1).getContext('2d') && typeof window.createImageBitmap === 'function';
+  }
+  return supportsOffscreenCanvas;
+}

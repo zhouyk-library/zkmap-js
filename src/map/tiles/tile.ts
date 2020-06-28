@@ -1,27 +1,74 @@
 import {TileState} from './types'
+const transparentPngUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQYV2NgAAIAAAUAAarVyFEAAAAASUVORK5CYII=';
+import Utils from '../utils'
 export default class Tile {
   private _z:number;
   private _x:number;
   private _y:number;
   private _url:string;
-  private _image:HTMLImageElement;
+  private _controller:AbortController;
+  private _image:HTMLImageElement | ImageBitmap;
   private _state:number = TileState.NONE;
   constructor(z: number, x: number, y: number, url: string) {
+    console.log(url)
     this._z = z
     this._x = x
     this._y = y
     this._url = url
+    this._controller = new window.AbortController()
   }
-  load(){
-    this._image = new Image(256,256);
+  arrayBufferToImageBitmap(data: ArrayBuffer){
+    const blob: Blob = new window.Blob([new Uint8Array(data)], {type: 'image/png'});
+    window.createImageBitmap(blob).then((imgBitmap) => {
+      this._image = imgBitmap
+      this._state = TileState.OK
+    }).catch(error => 
+      this._state = TileState.ERROR
+    );
+  }
+  arrayBufferToImage(data: ArrayBuffer){
+    const URL = window.URL;
+    const image = new window.Image();
+    this._image = image
     this._image.onerror = () => {
       this._state = TileState.ERROR
     };  
     this._image.onload = () => {
       this._state = TileState.OK
+      URL.revokeObjectURL(image.src);
     };
-    this._state = TileState.LOADING
-    this._image.src = this._url
+    const blob: Blob = new window.Blob([new Uint8Array(data)], {type: 'image/png'});
+    this._image.src = data.byteLength ? URL.createObjectURL(blob) : transparentPngUrl;
+    
+  }
+  load(){
+      const request = new window.Request(this._url, {
+        method: 'GET',
+        mode: 'cors',
+        signal: this._controller.signal
+      });
+      fetch(this._url, request).then(response => {
+        if (response.ok) {
+          response.arrayBuffer().then(data => {
+            if (Utils.Browser.offscreenCanvasSupported()) {
+              this.arrayBufferToImageBitmap(data);
+            } else {
+              this.arrayBufferToImage(data);
+            }
+          })
+        }
+      }).catch(error => console.log(error));
+    return this
+  }
+  destroy(){
+    this._controller.abort();
+    delete this._z
+    delete this._x
+    delete this._y
+    delete this._url
+    delete this._controller
+    delete this._image
+    delete this._state
     return this
   }
   getParentKeys():Array<String>{
@@ -47,5 +94,5 @@ export default class Tile {
   get zoom():number {return this._z}
   get x():number {return this._x}
   get y():number {return this._y}
-  get image():HTMLImageElement {return this._image}
+  get image():HTMLImageElement | ImageBitmap {return this._image}
 }

@@ -1,26 +1,14 @@
 import {Tile,TileState} from './types'
 export default class TilesCache {
-  private _tiles:Array<Tile>;
   private _key2tile:Map<String,Tile>;
+  private clearHandleTime: any;
   constructor() {
-    this._tiles = new Array();
     this._key2tile = new Map();
-  }
-  loadTiles(){
-    // const values:IterableIterator<Tile> = this._key2tile.values()
-    // const t:Tile = values.next()
-    // if(t && t.state === TileState.NONE){
-    //   t.load()
-    // }
-    this._tiles.filter((item:Tile)=>item.state === TileState.NONE).forEach((item:Tile)=>{
-      item.load()
-    })
   }
   add(z: number, x: number, y: number, url: string){
     const key:string = `${z}-${x}-${y}`
     if(this._key2tile.has(key)) return
     const tile:Tile = new Tile(z,x,y,url).load()
-    this._tiles.push(tile)
     this._key2tile.set(key,tile)
   }
   get(z: number, x0: number,x1: number, y0: number, y1: number):Array<Tile>{
@@ -34,8 +22,20 @@ export default class TilesCache {
     loadedTiles.sort(function(a:Tile, b:Tile){return a.zoom - b.zoom})
     return loadedTiles
   }
-  isAllFinishToZoom(z: number):boolean{
-    return this._tiles.filter(tile=> tile.zoom === z && !tile.isFinish).length === 0
+  clearNoneTiles(z: number){
+    if(this.clearHandleTime){
+      window.clearTimeout(this.clearHandleTime)
+    }
+    this.clearHandleTime = setTimeout(() => {
+      const deleteArray:Array<String> = new Array();
+      this._key2tile.forEach((value: Tile, key: String, map: Map<String, Tile>)=>{
+        value.zoom !== z && value.state == TileState.NONE && deleteArray.push(key)
+      })
+      deleteArray.forEach(item=>{
+        this._key2tile.get(item).destroy()
+        this._key2tile.delete(item)
+      })
+    }, 30);
   }
   private getLoadTile(z: number, x: number, y: number):Tile{
     let tile:Tile = null

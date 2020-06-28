@@ -34,6 +34,7 @@ export default class Painter {
         // this._tilesCache.add(this._transform.zoom,inexx,inexy,`http://webrd01.is.autonavi.com/appmaptile?x=${inexx}&y=${inexy}&z=${this._transform.zoom}&lang=zh_cn&size=1&scale=1&style=8`)
       }
     }
+    this._tilesCache.clearNoneTiles(this._transform.zoom)
   }
   render() {
     const ctx = this._ctx
