@@ -7,10 +7,10 @@ const BuildDonePlugin = require('./plugins/BuildDonePlugin')
 //使用node的模块
 module.exports = {
     //这就是我们项目编译的入口文件
-    entry: "./src/test/index.ts",
+    entry: "./src/dev/index.ts",
     output: {
-        filename: "test.js",
-        path: path.resolve(__dirname, '../dist/test')
+        filename: "dev.js",
+        path: path.resolve(__dirname, '../dist/dev')
     },
     resolve: {
         extensions: ['.ts','tsx','.js']
@@ -38,7 +38,7 @@ module.exports = {
     devServer:{
         open: true,
         //这个本地开发环境运行时是基于哪个文件夹作为根目录
-        contentBase:'./dist/test',
+        contentBase:'./dist/dev',
         //当你有错误的时候在控制台打出
         stats: 'errors-only',
         overlay: {
@@ -54,7 +54,7 @@ module.exports = {
     //这里就是一些插件
     plugins:[
         new CleanWebpackPlugin({
-            cleanOnceBeforeBuildPatterns: ['./dist/test']
+            cleanOnceBeforeBuildPatterns: ['./dist/dev']
         }),
         new HtmlWebpackPlugin({
             template: './template/index.html'

@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/build/zkmap.js",
   "scripts": {
-    "test": "cross-env NODE_ENV=development webpack-dev-server --config ./webpack/webpack.test.config.js  --progress",
+    "dev": "cross-env NODE_ENV=development webpack-dev-server --config ./webpack/webpack.dev.config.js  --progress",
     "build": "cross-env NODE_ENV=production webpack --config ./webpack/webpack.build.config.js",
     "watch": "webpack --watch"
   },
