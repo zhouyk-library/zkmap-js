@@ -51,7 +51,7 @@ class Transform {
   }
 
   clone(): Transform {
-    const clone:Transform = new Transform(null, this._minZoom, this._maxZoom, this._type);
+    const clone: Transform = new Transform(null, this._minZoom, this._maxZoom, this._type);
     clone.width = this.width;
     clone.height = this.height;
     clone._center = this._center;
@@ -84,9 +84,7 @@ class Transform {
        * 
        */
       const { scale, x, y } = option.scale
-      console.log(matrix.a,matrix.d)
-      const a = Math.abs(scale/(matrix.a/this._matrix[0])),d = Math.abs(scale/(matrix.d/this._matrix[3]))
-      console.log(a,d,scale)
+      const a = Math.abs(scale / (matrix.a / this._matrix[0])), d = Math.abs(scale / (matrix.d / this._matrix[3]))
       const a1 = matrix.a, e1 = matrix.e, x1 = x, x2 = x1;
       matrix.e = (x2 - a * (x1 - e1) - e1) / a1;
       const d1 = matrix.d, f1 = matrix.f, y1 = y, y2 = y1;
@@ -94,7 +92,6 @@ class Transform {
       matrix.a = a
       matrix.d = d
       this._ctx.transform(matrix.a, 0, 0, matrix.d, matrix.e, matrix.f);
-      console.log(this._ctx.getTransform())
     }
     if (option.mov) {
       const { dx, dy } = option.mov
@@ -103,7 +100,7 @@ class Transform {
       this._ctx.translate(matrix.e, matrix.f);
     }
     ctx.save();
-    ctx.setTransform(1,0,0,1,0,0);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, this.width, this.height);
     ctx.restore()
     this.updateVisualBound()
