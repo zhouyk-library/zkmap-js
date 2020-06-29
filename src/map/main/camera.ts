@@ -1,5 +1,5 @@
 import { LngLat } from '../geo/types';
-import { Evented } from './events';
+import { Evented } from '../events/types';
 import Transform from '../geo/transform';
 import { Render } from '../render/types';
 class Camera extends Evented {

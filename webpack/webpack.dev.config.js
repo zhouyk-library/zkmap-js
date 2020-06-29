@@ -48,6 +48,7 @@ module.exports = {
         //不启动压缩
         compress: true,
         hot: true,
+        // host: '0.0.0.0',
         host: 'localhost',
         port: port
     },

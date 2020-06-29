@@ -1,5 +1,5 @@
-import {extend} from './util';
-import {Listeners,Listener,ErrorLike} from './types'
+import Utils from '../utils';
+import {Listeners,Listener,Event} from './types'
 
 
 function _addEventListener(type: string, listener: Listener, listenerList: Listeners) {
@@ -19,24 +19,7 @@ function _removeEventListener(type: string, listener: Listener, listenerList: Li
   }
 }
 
-
-export class Event {
-  type?: string;
-  target?: any;
-  constructor(type: string, data: any = {}) {
-      extend(this, data);
-      this.type = type;
-  }
-}
-
-export class ErrorEvent extends Event {
-  error: ErrorLike;
-  constructor(error: ErrorLike, data: Object = {}) {
-      super('error', extend({error}, data));
-  }
-}
-
-export class Evented {
+export default class Evented {
   _listeners: Listeners;
   _oneTimeListeners: Listeners;
   _eventedParent?: Evented;
@@ -79,7 +62,7 @@ export class Evented {
 
           const parent = this._eventedParent;
           if (parent) {
-              extend(
+            Utils.Objects.extend(
                   event,
                   typeof this._eventedParentData === 'function' ? this._eventedParentData() : this._eventedParentData
               );

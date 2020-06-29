@@ -1,4 +1,3 @@
-import { Cancelable } from './types';
 export function extend(dest: Object, ...sources: Array<Object>): Object {
   for (const src of sources) {
     for (const k in src) {

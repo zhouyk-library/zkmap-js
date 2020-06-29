@@ -1,5 +1,7 @@
 import Camera from './camera';
-import { MapOptions, Event, Cancelable } from './types';
+import { Event } from '../events/types';
+import { MapOptions } from './types';
+import { Cancelable } from '../utils/types';
 import { Transform } from '../geo/types';
 import { Render } from '../render/types';
 import Utils from '../utils'
