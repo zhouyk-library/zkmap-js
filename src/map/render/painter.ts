@@ -34,7 +34,6 @@ export default class Painter {
     this._tilesCache.clearNoneTiles(this._transform.zoom)
   }
   render() {
-    const ctx = this._ctx
     const screenBound: Bound = this._transform.screenBound
     const allCount = Math.pow(2, this._transform.zoom)
     const outXEnd = this._transform.width, outXStart = 0, outYEnd = this._transform.height, outYStart = 0
@@ -53,16 +52,19 @@ export default class Painter {
       const screenX = item.x * width + inXStart;
       const screenY = item.y * width + inYStart;
       this._ctx.drawImage(item.image, screenX, screenY, width, width);
+      this.drawDebuggerRect(item.zoom,item.x,item.y,screenX,screenY,width,this._ctx)
+    })
+    this._ctx.restore();
+  }
+  drawDebuggerRect(z:number,x:number,y:number,screenX:number,screenY:number,width:number,ctx: CanvasRenderingContext2D){
       ctx.beginPath();
       ctx.strokeStyle = "#ff9999";
       ctx.fillStyle = "#ff9999";
       ctx.lineWidth = 1
       ctx.rect(screenX, screenY, width, width);
       ctx.font = `${30}px Verdana`;
-      ctx.fillText(`(${item.zoom},${item.x},${item.y})`, screenX + width/2 - 100, screenY + width/2 - 15, 200);
+      ctx.fillText(`(${z},${x},${y})`, screenX + width/2 - 100, screenY + width/2 - 15, 200);
       ctx.closePath()
       ctx.stroke();
-    })
-    this._ctx.restore();
   }
 }

@@ -51,7 +51,7 @@ class Transform {
   }
 
   clone(): Transform {
-    const clone = new Transform(null, this._minZoom, this._maxZoom, this._type);
+    const clone:Transform = new Transform(null, this._minZoom, this._maxZoom, this._type);
     clone.width = this.width;
     clone.height = this.height;
     clone._center = this._center;
