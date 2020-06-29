@@ -41,11 +41,11 @@ class Camera extends Evented {
   }
   wheelZoomCenter(event): void {
     const sensitivity = 100;
-    const delta = -event.deltaY / sensitivity > 0 ? 1 : -1;
-    if ((this.transform.maxZoom == this.transform.zoom && delta > 0)
-      || (this.transform.minZoom == this.transform.zoom && delta < 0)) return;
+    const delta = -event.deltaY / sensitivity /5
+    if ((this.transform.maxZoom < this.transform.zoom && delta > 0)
+      || (this.transform.minZoom > this.transform.zoom && delta < 0)) return;
     this.transform.zoom = this.transform.zoom + delta
-    const size = Math.pow(2, delta);
+    const size = Math.pow(2, this.transform.zoom);
     this.matrixRender({
       scale: {
         scale: size,

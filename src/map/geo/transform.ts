@@ -84,13 +84,17 @@ class Transform {
        * 
        */
       const { scale, x, y } = option.scale
+      console.log(matrix.a,matrix.d)
+      const a = Math.abs(scale/(matrix.a/this._matrix[0])),d = Math.abs(scale/(matrix.d/this._matrix[3]))
+      console.log(a,d,scale)
       const a1 = matrix.a, e1 = matrix.e, x1 = x, x2 = x1;
-      matrix.e = (x2 - scale * (x1 - e1) - e1) / a1;
+      matrix.e = (x2 - a * (x1 - e1) - e1) / a1;
       const d1 = matrix.d, f1 = matrix.f, y1 = y, y2 = y1;
-      matrix.f = (y2 - scale * (y1 - f1) - f1) / d1;
-      matrix.a = scale
-      matrix.d = scale
+      matrix.f = (y2 - d * (y1 - f1) - f1) / d1;
+      matrix.a = a
+      matrix.d = d
       this._ctx.transform(matrix.a, 0, 0, matrix.d, matrix.e, matrix.f);
+      console.log(this._ctx.getTransform())
     }
     if (option.mov) {
       const { dx, dy } = option.mov
@@ -133,6 +137,7 @@ class Transform {
   }
 
   get zoom(): number { return this._zoom; }
+  get zoomInt(): number { return Math.floor(this._zoom); }
   set zoom(zoom: number) {
     const z = Math.min(Math.max(zoom, this.minZoom), this.maxZoom);
     if (this._zoom === z) return;
