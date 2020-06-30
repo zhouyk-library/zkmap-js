@@ -36,8 +36,8 @@ class Transform {
     this._maxZoom = maxZoom || constant.maxZoom;
     this.width = canvas && canvas.width;
     this.height = canvas && canvas.height;
-    this._center = new LngLat(119.22795, 35.50612);
-    this._zoom = 10;
+    this._center = new LngLat(119.47889, 35.361946);
+    this._zoom = 15;
     this._projection = new WebMercator();
     this._bound = this._projection.bound;
 
