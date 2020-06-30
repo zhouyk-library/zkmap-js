@@ -14,7 +14,7 @@ class LngLat {
       }
   }
 
-  toArray() {
+  toArray():Array<number> {
       return [this.lng, this.lat];
   }
 

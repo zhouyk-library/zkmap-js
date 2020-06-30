@@ -30,6 +30,7 @@ class Camera extends Evented {
           dy: event.y - this.start.y
         }
       })
+      this.transform.moveCenter([event.x - this.start.x,event.y - this.start.y])
       this.start.x = event.x;
       this.start.y = event.y;
     }
@@ -53,6 +54,8 @@ class Camera extends Evented {
         y: event.y
       }
     })
+    this.transform.anchorPoint = [event.x,event.y]
+    this.transform.mzoom = this.transform.zoom
   }
   matrixRender(option: any): void {
     this.transform.matrix(option)

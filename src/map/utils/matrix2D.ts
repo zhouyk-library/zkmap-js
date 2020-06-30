@@ -8,6 +8,13 @@ export function create():Array<number> {
 }
 
 /**
+ * DOMMatrix对象数组化
+ */
+export function matrixToArray(matrix: DOMMatrix):Array<number> {
+  return Array.from([matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f])
+}
+
+/**
  * 将矩阵转换为CSS的transform变量
  * @param mat 
  */
@@ -99,7 +106,7 @@ export function setFromArray(transform1:Array<number>, transform2:Array<number>)
 }
 
 /**
- * 将经纬度进行矩阵转换
+ * 将坐标进行矩阵转换
  * @param transform 
  * @param coordinate 
  */
@@ -109,6 +116,15 @@ export function transform(transform:Array<number>, coordinate:Array<number>):Arr
   coordinate[0] = transform[0] * x + transform[2] * y + transform[4];
   coordinate[1] = transform[1] * x + transform[3] * y + transform[5];
   return coordinate;
+}
+
+/**
+ * 将坐标进行逆矩阵转换
+ * @param targTransform 
+ * @param coordinate 
+ */
+export function invertTransform(targTransform:Array<number>, coordinate:Array<number>):Array<number> {
+  return transform(invert(setFromArray(tmp_, targTransform)),coordinate);
 }
 
 /**
