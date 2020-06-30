@@ -18,19 +18,15 @@ class Camera extends Evented {
     this.on('mouseup', this.mouseupDetail)
     this.on('mousemove', this.mousemoveDetail)
     this.on('mousedown', this.mousedownDetail)
+    this.render.computed()
   }
   mouseupDetail(event): void {
     this.dragFlag = false
   }
   mousemoveDetail(event): void {
     if (this.dragFlag) {
-      this.matrixRender({
-        mov: {
-          dx: event.x - this.start.x,
-          dy: event.y - this.start.y
-        }
-      })
       this.transform.moveCenter([event.x - this.start.x,event.y - this.start.y])
+      this.render.computed()
       this.start.x = event.x;
       this.start.y = event.y;
     }
@@ -45,22 +41,9 @@ class Camera extends Evented {
     const delta = -event.deltaY / sensitivity /5
     if ((this.transform.maxZoom < this.transform.zoom && delta > 0)
       || (this.transform.minZoom > this.transform.zoom && delta < 0)) return;
-    this.transform.zoom = this.transform.zoom + delta
-    const size = Math.pow(2, this.transform.zoom);
-    this.matrixRender({
-      scale: {
-        scale: size,
-        x: event.x,
-        y: event.y
-      }
-    })
     this.transform.anchorPoint = [event.x,event.y]
-    this.transform.mzoom = this.transform.zoom
-  }
-  matrixRender(option: any): void {
-    this.transform.matrix(option)
+    this.transform.zoom = this.transform.zoom + delta
     this.render.computed()
-    // this.render.drawLngLatLine()
   }
   getCenter(): LngLat { return new LngLat(this.transform.center.lng, this.transform.center.lat); }
   setCenter(center: LngLat, eventData?: Object) {

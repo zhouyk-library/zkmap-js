@@ -10,7 +10,6 @@ export default class Painter {
     this._tilesCache = new TilesCache()
   }
   computed() {
-    const ctx = this._ctx
     const screenBound: Bound = this._transform.screenBound
     const allCount = Math.pow(2, this._transform.zoomInt)
     const outXEnd = this._transform.width, outXStart = 0, outYEnd = this._transform.height, outYStart = 0
@@ -45,8 +44,6 @@ export default class Painter {
     var xend = Math.ceil(allCount / countX * (Math.min(inXEnd, outXEnd) - inXStart))
     var ystart = Math.floor(allCount / countY * (Math.max(inYStart, outYStart) - inYStart))
     var yend = Math.ceil(allCount / countY * (Math.min(inYEnd, outYEnd) - inYStart))
-    this._ctx.save();
-    this._ctx.setTransform(1, 0, 0, 1, 0, 0);
     this._tilesCache.get(this._transform.zoomInt, xstart, xend, ystart, yend).forEach((item: Tile) => {
       const width = 256 * Math.pow(2, this._transform.zoom - item.zoom)
       const screenX = item.x * width + inXStart;
@@ -54,7 +51,6 @@ export default class Painter {
       this._ctx.drawImage(item.image, screenX, screenY, width, width);
       this.drawDebuggerRect(item.zoom, item.x, item.y, screenX, screenY, width, this._ctx)
     })
-    this._ctx.restore();
   }
   drawDebuggerRect(z: number, x: number, y: number, screenX: number, screenY: number, width: number, ctx: CanvasRenderingContext2D) {
     ctx.beginPath();
