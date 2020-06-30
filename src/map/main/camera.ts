@@ -45,15 +45,10 @@ class Camera extends Evented {
     this.transform.zoom = this.transform.zoom + delta
     this.render.computed()
   }
-  getCenter(): LngLat { return new LngLat(this.transform.center.lng, this.transform.center.lat); }
-  setCenter(center: LngLat, eventData?: Object) {
-  }
+  getCenter(): LngLat { return this.transform.center; }
+  setCenter(center: LngLat) { this.transform.center = center}
   getZoom(): number { return this.transform.zoom; }
-
-  setZoom(zoom: number, eventData?: Object) {
-    return this;
-  }
-
+  setZoom(zoom: number) { this.transform.zoom = zoom}
 }
 
 export default Camera;

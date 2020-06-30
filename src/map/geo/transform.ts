@@ -49,13 +49,8 @@ class Transform {
     Utils.Matrix2D.setFromArray(this._default,[256/(this._bound.xmax - this._bound.xmin) * this._bound.xscale, 0, 0, 256 / (this._bound.ymax - this._bound.ymin) * this._bound.yscale, this.width / 2, this.height / 2])
     // 设置当前矩阵居中
     this._matrix = [256 * Math.pow(2, this._zoom) / (this._bound.xmax - this._bound.xmin) * this._bound.xscale, 0, 0, 256 * Math.pow(2, this._zoom) / (this._bound.ymax - this._bound.ymin) * this._bound.yscale, this.width / 2, this.height / 2]
-    // 当前矩阵以center居中
-    const screen = this.lngLat2screen(this._center.toArray())
-    this.moveCenter([this.width / 2 - screen[0], this.height / 2 - screen[1]])
-
-    //设置初始矩阵，由于地图切片是256*256，Math.pow(2, this._zoom)代表在一定缩放级别下x与y轴的切片数量
+    this.setCenter(this._center)
     this._ctx.setTransform(1, 0, 0, 1, 0, 0);
-
     this.updateVisualBound()
   }
   get context(): Context {
@@ -92,9 +87,22 @@ class Transform {
 
   get center(): LngLat { return this._center; }
   set center(center: LngLat) {
-    this._anchorPoint = null
     if (center.lat === this._center.lat && center.lng === this._center.lng) return;
     this._center = center;
+    this.setCenter(center)
+  }
+  setCenter(lngLat: LngLat){
+    const screen = this.lngLat2screen(lngLat.toArray())
+    this.moveCenter([this.width / 2 - screen[0], this.height / 2 - screen[1]])
+  }
+  moveCenter([dx, dy]: number[]){
+    const dxe = dx / this._matrix[0]
+    const dyf = dy / this._matrix[3]
+    Utils.Matrix2D.translate(this._matrix,dxe,dyf)
+    this.clearTransform()
+  }
+  set anchorPoint(pixel: number[]){
+    this._anchorPoint = pixel
   }
   get zoom(): number { return this._zoom; }
   get zoomInt(): number { return Math.floor(this._zoom); }
@@ -105,13 +113,6 @@ class Transform {
     this._scale = this.zoomScale(z);
     this._tileZoom = Math.floor(z);
     this.updateZoomMatrix()
-  }
-  clearTransform(){
-    this._ctx.save();
-    this._ctx.setTransform(1, 0, 0, 1, 0, 0);
-    this._ctx.clearRect(0, 0, this.width, this.height);
-    this._ctx.restore()
-    this.updateVisualBound()
   }
   updateZoomMatrix(){
     /**
@@ -134,7 +135,9 @@ class Transform {
      * 
      */
     const matrix:Array<number> = this.default
-    const x = this._anchorPoint[0], y = this._anchorPoint[1]
+    const anchorPoint = this._anchorPoint && this._anchorPoint.slice() || this.lngLat2screen(this._center.toArray())
+    this._anchorPoint = null
+    const x = anchorPoint[0], y = anchorPoint[1]
     const a = Math.abs(this._scale / (this._matrix[0] / matrix[0])), d = Math.abs(this._scale / (this._matrix[3] / matrix[3]))
     const e1 = this._matrix[4], x1 = x, x2 = x1;
     const e = (x2 - a * (x1 - e1) - e1) / this._matrix[0];
@@ -143,16 +146,12 @@ class Transform {
     Utils.Matrix2D.multiply(this._matrix,Array.from([a, 0, 0, d, e, f]))
     this.clearTransform()
   }
-  moveCenter([dx, dy]: number[]){
-    this._anchorPoint = null
-    const dxe = dx / this._matrix[0]
-    const dyf = dy / this._matrix[3]
-    Utils.Matrix2D.translate(this._matrix,dxe,dyf)
-    this.clearTransform()
-    console.log(this._matrix)
-  }
-  set anchorPoint(pixel: number[]){
-    this._anchorPoint = pixel
+  clearTransform(){
+    this._ctx.save();
+    this._ctx.setTransform(1, 0, 0, 1, 0, 0);
+    this._ctx.clearRect(0, 0, this.width, this.height);
+    this._ctx.restore()
+    this.updateVisualBound()
   }
   lngLat2Project(lngLat: number[]): number[]{
     return this._projection.project(lngLat)
