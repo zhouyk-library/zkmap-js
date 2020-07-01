@@ -1,5 +1,5 @@
 import Camera from './camera';
-import { Event } from '../events/types';
+import { Event, EventHandlerManager } from '../events/types';
 import { MapOptions } from './types';
 import { Cancelable } from '../utils/types';
 import { Transform } from '../geo/types';
@@ -13,6 +13,7 @@ class Map extends Camera {
   private _frame: Cancelable;
   private _options: MapOptions;
   private _canvasContainer: HTMLElement;
+  private _eventHandlerManager: EventHandlerManager;
   constructor(options?: MapOptions) {
     if (options.minZoom != null && options.maxZoom != null && options.minZoom > options.maxZoom) {
       throw new Error(`maxZoom must be greater than or equal to minZoom`);
@@ -43,6 +44,8 @@ class Map extends Camera {
     this._options = options;
     this._canvas = canvas;
     this._container = container
+    this._canvasContainer = canvasContainer
+    this._eventHandlerManager = new EventHandlerManager(this)
     this._bind()
     this.resize();
     this._render = render;

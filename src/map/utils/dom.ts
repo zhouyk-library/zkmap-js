@@ -1,3 +1,4 @@
+import { Point } from '../geo/types'
 export function create(tagName: string, className?: string, cssText?: string, container?: HTMLElement) {
   const el = window.document.createElement(tagName);
   if (className !== undefined) el.className = className;
