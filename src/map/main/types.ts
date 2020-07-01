@@ -8,3 +8,7 @@ export type MapOptions = {
   maxZoom?: number,
   type: string
 };
+import Map from './map';
+export {
+  Map
+}

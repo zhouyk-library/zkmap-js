@@ -12,6 +12,7 @@ class Map extends Camera {
   private _render: Render;
   private _frame: Cancelable;
   private _options: MapOptions;
+  private _canvasContainer: HTMLElement;
   constructor(options?: MapOptions) {
     if (options.minZoom != null && options.maxZoom != null && options.minZoom > options.maxZoom) {
       throw new Error(`maxZoom must be greater than or equal to minZoom`);
@@ -20,8 +21,6 @@ class Map extends Camera {
       options.minZoom = 0
       options.maxZoom = 22
     }
-    const canvas = document.createElement("canvas");
-    canvas.style.cssText = "height: 100%; width: 100%";
     var container = null
     if (typeof options.container === 'string') {
       container = window.document.getElementById(options.container) as HTMLDivElement;
@@ -33,9 +32,11 @@ class Map extends Camera {
     } else {
       throw new Error(`Invalid type: 'container' must be a String or HTMLElement.`);
     }
+    const canvasContainer: HTMLElement = Utils.DOM.create('div', undefined, 'touch-action: none;cursor: grab;user-select: none;', container)
+    const canvas: HTMLCanvasElement = <HTMLCanvasElement>Utils.DOM.create('canvas', undefined, "position: absolute;left: 0;top: 0;", canvasContainer);
     canvas.width = container.clientWidth;
     canvas.height = container.clientHeight;
-    container.appendChild(canvas);
+    container.appendChild(canvasContainer);
     const transform = new Transform(canvas, options.minZoom, options.maxZoom, options.type);
     const render = new Render(transform);
     super(transform, render);
@@ -48,7 +49,9 @@ class Map extends Camera {
     this.triggerRepaint()
     this.on('refresh', this.triggerRepaint)
   }
-
+  getCanvasContainer(): HTMLElement {
+    return this._canvasContainer
+  }
   resize(eventData?: Object) {
     this.transform.resize(this._container.clientWidth, this._container.clientHeight)
   }
