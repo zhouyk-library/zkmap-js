@@ -5,6 +5,7 @@ import Point from '../geo/point';
 export default class EventHandlerManager {
   private _map: Map;
   private _el: HTMLElement;
+  private _frameId: number;
   private _handlers: Array<{ handlerName: string, handler: Handler, allowed:  Array<string> }> = new Array();
   private _listeners: Array<[HTMLElement | Window | Document, string, { passive?: boolean, capture?: boolean }]>;
   constructor(map: Map) {
@@ -62,14 +63,24 @@ export default class EventHandlerManager {
       handler.reset();
     }
   }
-  renderFrame(){
+  computedRenderFrame(){
     for (const {handler, allowed} of this._handlers) {
       let data: HandlerResult | void;
       if (!handler.isEnabled()) continue;
       data = handler.renderFrame();
     }
   }
-  _triggerRenderFrame(){
+  updateTransform(timeStamp:number){
+
+  }
+  triggerRenderFrame(){
+    if (this._frameId === undefined) {
+        this._frameId = this._map._requestRenderFrame((timeStamp) => {
+            delete this._frameId;
+            this.computedRenderFrame();
+            this.updateTransform(timeStamp);
+        });
+    }
 
   }
 }

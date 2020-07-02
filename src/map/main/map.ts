@@ -4,6 +4,7 @@ import { MapOptions } from './types';
 import { Cancelable } from '../utils/types';
 import { Transform } from '../geo/types';
 import { Render } from '../render/types';
+import { TaskQueue,TaskID } from '../queue/types';
 import Utils from '../utils'
 
 class Map extends Camera {
@@ -12,6 +13,7 @@ class Map extends Camera {
   private _render: Render;
   private _frame: Cancelable;
   private _options: MapOptions;
+  private _renderTaskQueue: TaskQueue;
   private _canvasContainer: HTMLElement;
   private _eventHandlerManager: EventHandlerManager;
   constructor(options?: MapOptions) {
@@ -42,6 +44,7 @@ class Map extends Camera {
     const render = new Render(transform);
     super(transform, render);
     this._options = options;
+    this._renderTaskQueue = new TaskQueue();
     this._canvas = canvas;
     this._container = container
     this._canvasContainer = canvasContainer
@@ -58,7 +61,11 @@ class Map extends Camera {
   resize(eventData?: Object) {
     this.transform.resize(this._container.clientWidth, this._container.clientHeight)
   }
-
+  
+  _requestRenderFrame(callback: (_:any) => void): TaskID {
+    this._update();
+    return this._renderTaskQueue.add(callback);
+  }
   _update(updateStyle?: boolean) {
   }
   _bind() {

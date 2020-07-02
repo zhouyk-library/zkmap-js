@@ -11,6 +11,7 @@ export default class ScrollHandler implements Handler {
   private _lastEvent: any;
   private _delta: number;
   private _zooming: boolean;
+  private _prevEase?: {start: number, duration: number, easing: (_: number) => number};
   private _startZoom?: number;
   private _easing?: (_:number) => number;
   private _aroundPoint: Point;
@@ -35,10 +36,10 @@ export default class ScrollHandler implements Handler {
     this._active = false;
   };
   wheel(e: WheelEvent, point: Point):HandlerResult | void{
-    console.log('ScrollHandler.wheel',e.deltaMode)
     let value = e.deltaMode === window.WheelEvent.DOM_DELTA_LINE ? e.deltaY * 40 : e.deltaY;
     const sensitivity = 100;
     const delta = -e.deltaY / sensitivity /5
+    console.log('ScrollHandler.wheel',delta)
     const now = Utils.Browser.now(), timeDelta = now - (this._lastEventTime || 0);
     this._lastEventTime = now;
     
@@ -61,8 +62,9 @@ export default class ScrollHandler implements Handler {
     this._active = true;
     this._zooming = true;
     this._lastEvent = e;
-    this._aroundPoint =  new Point(e.x,e.y)
-    this._handler._triggerRenderFrame();
+    this._aroundPoint =  new Point(e.x,e.y);
+    console.log(this._aroundPoint)
+    this._handler.triggerRenderFrame();
   }
   renderFrame():HandlerResult {
     return this._onScrollFrame();
@@ -99,7 +101,7 @@ export default class ScrollHandler implements Handler {
     this._active = true;
     if (finished) {
         this._active = false;
-        this._handler._triggerRenderFrame();
+        this._handler.triggerRenderFrame();
         this._zooming = false;
     }
     return {
@@ -109,7 +111,22 @@ export default class ScrollHandler implements Handler {
         originalEvent: this._lastEvent
     };
   }
-  _smoothOutEasing(time:number):(_:number) => number{
-    return (time:number)=>{ return time}
+  _smoothOutEasing(duration:number):(_:number) => number {
+    let easing = Utils.Math.ease;
+    if (this._prevEase) {
+      const ease = this._prevEase,
+          t = (Utils.Browser.now() - ease.start) / ease.duration,
+          speed = ease.easing(t + 0.01) - ease.easing(t),
+          x = 0.27 / Math.sqrt(speed * speed + 0.0001) * 0.01,
+          y = Math.sqrt(0.27 * 0.27 - x * x);
+      easing = Utils.Math.bezier(x, y, 0.25, 1);
+    }
+
+    this._prevEase = {
+      start: Utils.Browser.now(),
+      duration,
+      easing
+    };
+    return easing;
   }
 }
