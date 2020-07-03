@@ -66,14 +66,13 @@ export default class EventHandlerManager {
         data = handler[type](e, points);
         // data && console.log(data.targetZoom)
         if(data){
-          if(data.renderFrame){
-            this.triggerRenderFrame()
-          }
           if(!!data.around) this._map.transform.anchorPoint = data.around.toArray()
           if(!!data.targetZoom) this._map.transform.zoom = data.targetZoom
           if(!!data.dragDelta) this._map.transform.moveCenter(data.dragDelta.toArray())
           this._map._render.computed()
-          this._map._update()
+          if(data.renderFrame){
+            this.triggerRenderFrame()
+          }
         }
       }
     }

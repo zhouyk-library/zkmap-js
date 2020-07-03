@@ -13,14 +13,27 @@ export default class TilesCache {
   }
   get(z: number, x0: number,x1: number, y0: number, y1: number):Array<Tile>{
     const loadedTiles = []
-    for (let ii = x0; ii <= x1; ii++) {
-      for (let jj = y0; jj <= y1; jj++) {
+    for (let ii = x0; ii < x1; ii++) {
+      for (let jj = y0; jj < y1; jj++) {
         const tile:Tile = this.getLoadTile(z,ii,jj)
         tile && loadedTiles.push(tile)
       }
     }
     loadedTiles.sort(function(a:Tile, b:Tile){return a.zoom - b.zoom})
     return loadedTiles
+  }
+  isFinishZoom(z: number, x0: number,x1: number, y0: number, y1: number):Boolean{
+    const loadedTiles = []
+    for (let ii = x0; ii < x1; ii++) {
+      for (let jj = y0; jj < y1; jj++) {
+        const key:string = `${z}-${ii}-${jj}`
+        const tile:Tile = this._key2tile.get(key)
+        if(!tile || !tile.isFinish){
+          return false
+        }
+      }
+    }
+    return true
   }
   clearNoneTiles(z: number){
     if(this.clearHandleTime){

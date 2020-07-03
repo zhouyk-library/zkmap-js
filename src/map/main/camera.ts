@@ -4,21 +4,19 @@ import Transform from '../geo/transform';
 import { Render } from '../render/types';
 class Camera extends Evented {
   transform: Transform;
-  render: Render;
+  _render: Render;
   offsetX: number = 0;
   offsetY: number = 0;
   dragFlag: boolean;
   start: any = {};
 
-  constructor(transform: Transform, render: Render) {
+  constructor(transform: Transform) {
     super();
     this.transform = transform;
-    this.render = render;
     this.on('wheel', this.wheelZoomCenter)
     this.on('mouseup', this.mouseupDetail)
     this.on('mousemove', this.mousemoveDetail)
     this.on('mousedown', this.mousedownDetail)
-    this.render.computed()
   }
   mouseupDetail(event): void {
     this.dragFlag = false
