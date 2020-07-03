@@ -26,6 +26,7 @@ export {
 }
 
 export type HandlerResult = {
+  dragDelta?: Point,
   around?: Point | null,
   renderFrame?: Boolean,
   targetZoom?: number,

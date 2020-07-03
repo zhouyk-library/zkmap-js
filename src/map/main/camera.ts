@@ -25,10 +25,10 @@ class Camera extends Evented {
   }
   mousemoveDetail(event): void {
     if (this.dragFlag) {
-      this.transform.moveCenter([event.x - this.start.x,event.y - this.start.y])
-      this.render.computed()
-      this.start.x = event.x;
-      this.start.y = event.y;
+      // this.transform.moveCenter([event.x - this.start.x,event.y - this.start.y])
+      // this.render.computed()
+      // this.start.x = event.x;
+      // this.start.y = event.y;
     }
   }
   mousedownDetail(event): void {

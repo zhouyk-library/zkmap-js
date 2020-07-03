@@ -54,6 +54,9 @@ class Map extends Camera {
     this._render = render;
     this.triggerRepaint()
     this.on('refresh', this.triggerRepaint)
+    this._requestRenderFrame(()=>{
+      this._render.computed()
+    })
   }
   getCanvasContainer(): HTMLElement {
     return this._canvasContainer
@@ -71,6 +74,7 @@ class Map extends Camera {
       this._frame = null;
       console.log("requestAnimationFrame")
       this._renderTaskQueue.run()
+      this._render.computed()
       this._render.render();
       return this
     });

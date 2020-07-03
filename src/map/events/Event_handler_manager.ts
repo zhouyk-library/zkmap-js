@@ -43,7 +43,7 @@ export default class EventHandlerManager {
   }
   initDefaultHandlers(){
     this.addHandler('scrollZoom', new ScrollHandler(this._map,this), ['wheel']);
-    this.addHandler('mousePan', new MouseHandler(), ['mousemove','mouseup','mousedown']);
+    this.addHandler('mousePan', new MouseHandler(this._map,this), ['mousemove','mouseup','mousedown']);
     
     for (const {handler} of this._handlers) {
       handler.enable();
@@ -66,12 +66,14 @@ export default class EventHandlerManager {
         data = handler[type](e, points);
         // data && console.log(data.targetZoom)
         if(data){
-          this._map.transform.anchorPoint = data.around.toArray()
-          this._map.transform.zoom = data.targetZoom
-          this._map._render.computed()
           if(data.renderFrame){
             this.triggerRenderFrame()
           }
+          if(!!data.around) this._map.transform.anchorPoint = data.around.toArray()
+          if(!!data.targetZoom) this._map.transform.zoom = data.targetZoom
+          if(!!data.dragDelta) this._map.transform.moveCenter(data.dragDelta.toArray())
+          this._map._render.computed()
+          this._map._update()
         }
       }
     }
