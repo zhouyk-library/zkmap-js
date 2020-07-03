@@ -2,6 +2,7 @@ import { Map } from '../main/types'
 import { InputEvent, Handler, ScrollHandler, MouseHandler, HandlerResult } from './types'
 import Utils from "../utils";
 import Point from '../geo/point';
+
 export default class EventHandlerManager {
   private _map: Map;
   private _el: HTMLElement;
@@ -31,21 +32,14 @@ export default class EventHandlerManager {
     for (const [target, type, listenerOptions] of this._listeners) {
       Utils.DOM.addEventListener(target, type, this.handleEvent.bind(this), listenerOptions);
     }
-
   }
-  handleEvent(e: InputEvent, eventName?: string) {
+  handleEvent(e: InputEvent|any) {
     const type = e.type
-    if (e.type === 'blur') {
-        this.stop();
-        return;
+    if (type === 'blur') {
+      this.stop();
+      return;
     }
-    const points =  new Point(e.x,e.y)
-    for (const {handler, allowed} of this._handlers) {
-      if (!handler.isEnabled()) continue;
-      if (allowed.includes(type)) {
-        handler[type](e, points);
-      }
-    }
+    this.computedRenderFrame(e,type)
   }
   initDefaultHandlers(){
     this.addHandler('scrollZoom', new ScrollHandler(this._map,this), ['wheel']);
@@ -63,24 +57,36 @@ export default class EventHandlerManager {
       handler.reset();
     }
   }
-  computedRenderFrame(){
+  computedRenderFrame(e: InputEvent|any,type:string,timeStamp?:number):void{
+    const points =  new Point(e.x,e.y)
     for (const {handler, allowed} of this._handlers) {
-      let data: HandlerResult | void;
       if (!handler.isEnabled()) continue;
-      data = handler.renderFrame();
+      let data: HandlerResult | void;
+      if (handler[type]) {
+        data = handler[type](e, points);
+        // data && console.log(data.targetZoom)
+        if(data){
+          this._map.transform.anchorPoint = data.around.toArray()
+          this._map.transform.zoom = data.targetZoom
+          this._map._render.computed()
+          if(data.renderFrame){
+            this.triggerRenderFrame()
+          }
+        }
+      }
     }
   }
-  updateTransform(timeStamp:number){
-
+  updateTransform(timeStamp:number):void {
+    // this.transform.anchorPoint = [event.x,event.y]
+    // this.transform.zoom = this.transform.zoom + delta
   }
   triggerRenderFrame(){
     if (this._frameId === undefined) {
-        this._frameId = this._map._requestRenderFrame((timeStamp) => {
-            delete this._frameId;
-            this.computedRenderFrame();
-            this.updateTransform(timeStamp);
-        });
+      this._frameId = this._map._requestRenderFrame((timeStamp:number) => {
+        delete this._frameId;
+        this.computedRenderFrame({},'renderFrame', timeStamp);
+        this.updateTransform(timeStamp);
+      });
     }
-
   }
 }

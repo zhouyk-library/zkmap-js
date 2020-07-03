@@ -10,7 +10,7 @@ import Utils from '../utils'
 class Map extends Camera {
   private _container: HTMLElement;
   private _canvas: HTMLCanvasElement;
-  private _render: Render;
+  _render: Render;
   private _frame: Cancelable;
   private _options: MapOptions;
   private _renderTaskQueue: TaskQueue;
@@ -67,6 +67,13 @@ class Map extends Camera {
     return this._renderTaskQueue.add(callback);
   }
   _update(updateStyle?: boolean) {
+    this._frame = Utils.Browser.requestAnimationFrame((paintStartTimeStamp: number) => {
+      this._frame = null;
+      console.log("requestAnimationFrame")
+      this._renderTaskQueue.run()
+      this._render.render();
+      return this
+    });
   }
   _bind() {
     this._canvas.addEventListener("click", this._onClick.bind(this));
@@ -109,12 +116,12 @@ class Map extends Camera {
     this._canvas.removeEventListener("wheel", this._onWheel);
   }
   triggerRepaint() {
-    this._frame = Utils.Browser.requestAnimationFrame((paintStartTimeStamp: number) => {
-      this._frame = null;
-      this._render.render();
-      this.triggerRepaint()
-      return this
-    });
+    // this._frame = Utils.Browser.requestAnimationFrame((paintStartTimeStamp: number) => {
+    //   this._frame = null;
+    //   this._render.render();
+    //   this.triggerRepaint()
+    //   return this
+    // });
   }
 }
 

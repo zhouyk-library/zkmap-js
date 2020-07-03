@@ -16,7 +16,6 @@ export default class MouseHandler implements Handler {
   };
   mousemove(e: MouseEvent, point: Point):HandlerResult | void{
     if (this._dragFlag) {
-      console.log([e.x - this._start.x,e.y - this._start.y])
     }
   };
   mouseup(e: MouseEvent, point: Point):HandlerResult | void{

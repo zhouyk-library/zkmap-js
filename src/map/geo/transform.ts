@@ -37,7 +37,7 @@ class Transform {
     this.width = canvas && canvas.width;
     this.height = canvas && canvas.height;
     this._center = new LngLat(119.47889, 35.361946);
-    this._zoom = 15;
+    this._zoom = 1;
     this._projection = new WebMercator();
     this._bound = this._projection.bound;
 
@@ -150,8 +150,8 @@ class Transform {
     this._ctx.save();
     this._ctx.setTransform(1, 0, 0, 1, 0, 0);
     this._ctx.clearRect(0, 0, this.width, this.height);
-    this._ctx.restore()
-    this.updateVisualBound()
+    this._ctx.restore();
+    this.updateVisualBound();
   }
   lngLat2Project(lngLat: number[]): number[]{
     return this._projection.project(lngLat)
