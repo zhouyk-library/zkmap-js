@@ -81,6 +81,17 @@ export default class Tile {
     }
     return keys;
   }
+  getChildrenKeys(): Array<String> {
+    const keys: Array<String> = new Array()
+    let x = this._x, y = this._y, z = this._z + 1
+    if (z === 0) return keys
+    for (let index = 0; index <= 1; index++) {
+      y = y + index
+      x = x + index
+      keys.push(`${index}-${x}-${y}`)
+    }
+    return keys;
+  }
   include(z: number, x: number, y: number): Boolean {
     if (z <= this._z) return false
     const char = z - this._z

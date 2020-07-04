@@ -45,22 +45,22 @@ export default class Painter {
   render() {
     const screenBound: Bound = this._transform.screenBound
     const inXStart = screenBound.xmin, inYStart = screenBound.ymin
-    if(timeOutFlag){clearTimeout(timeOutFlag);timeOutFlag = null}
+    if (timeOutFlag) { clearTimeout(timeOutFlag); timeOutFlag = null }
     this._tilesCache.get(this._transform.zoomInt, this.xstart, this.xend, this.ystart, this.yend).forEach((item: Tile) => {
       const width = 256 * Math.pow(2, this._transform.zoom - item.zoom)
       const screenX = item.x * width + inXStart;
       const screenY = item.y * width + inYStart;
       this._ctx.drawImage(item.image, screenX, screenY, width, width);
-      this.drawDebuggerRect(item.zoom, item.x, item.y, screenX, screenY, width, this._ctx)
+      // this.drawDebuggerRect(item.zoom, item.x, item.y, screenX, screenY, width, this._ctx)
     })
-    if(!this._tilesCache.isFinishZoom(this._transform.zoomInt, this.xstart, this.xend, this.ystart, this.yend)){
+    if (!this._tilesCache.isFinishZoom(this._transform.zoomInt, this.xstart, this.xend, this.ystart, this.yend)) {
       timeOutFlag = setTimeout(() => {
-        this._map._update()
+        this.render()
         timeOutFlag = null
       }, 16.66);
     }
   }
-  renderTile(tile: Tile){
+  renderTile(tile: Tile) {
     const screenBound: Bound = this._transform.screenBound
     const inXStart = screenBound.xmin, inYStart = screenBound.ymin
     const width = 256 * Math.pow(2, this._transform.zoom - tile.zoom)
