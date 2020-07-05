@@ -40,14 +40,12 @@ export default class Painter {
       for (let inexy = this.ystart; inexy < this.yend; inexy++) {
         // this._tilesCache.add(this._transform.zoomInt,inexx,inexy,`http://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${this._transform.zoomInt}/${inexy}/${inexx}`)
         // this._tilesCache.add(this._transform.zoomInt,inexx,inexy,`http://localhost:39999/map/rizhao/google/${this._transform.zoomInt}/${inexx}/${inexy}.jpeg`)
-        // this._tilesCache.add(this._transform.zoomInt, inexx, inexy, `http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x=${inexx}&y=${inexy}&z=${this._transform.zoomInt}`)
-        // this._tilesCache.add(this._transform.zoomInt,inexx,inexy,`https://tile.openstreetmap.org/${this._transform.zoomInt}/${inexx}/${inexy}.png`)
-        // this._tilesCache.add(this._transform.zoomInt,inexx,inexy,`http://192.168.1.149:39999/map/rizhao/osm/${this._transform.zoomInt}/${inexx}/${inexy}.png`)
-        this._tilesCache.add(this._transform.zoomInt, inexx, inexy, `http://webrd01.is.autonavi.com/appmaptile?x=${inexx}&y=${inexy}&z=${this._transform.zoomInt}&lang=zh_cn&size=1&scale=1&style=8`)
+        this._tilesCache.add(this._transform.zoomInt, inexx, inexy, `http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x=${inexx}&y=${inexy}&z=${this._transform.zoomInt}`)
+          // this._tilesCache.add(this._transform.zoomInt,inexx,inexy,`https://tile.openstreetmap.org/${this._transform.zoomInt}/${inexx}/${inexy}.png`)
+          // this._tilesCache.add(this._transform.zoomInt,inexx,inexy,`http://192.168.1.149:39999/map/rizhao/osm/${this._transform.zoomInt}/${inexx}/${inexy}.png`)
+          // this._tilesCache.add(this._transform.zoomInt, inexx, inexy, `http://webrd01.is.autonavi.com/appmaptile?x=${inexx}&y=${inexy}&z=${this._transform.zoomInt}&lang=zh_cn&size=1&scale=1&style=8`)
           .then((tile: Tile) => {
-            console.log(tile.key);
             this.renderTile(tile)
-            // this.render()
           })
       }
     }
@@ -56,6 +54,7 @@ export default class Painter {
   render() {
     if (this._settimeoutindex) { window.clearTimeout(this._settimeoutindex) }
     this._ctx.drawImage(this._screen_canvas.getImage(), 0, 0, this._transform.width, this._transform.height);
+    this._transform.clearOutTransform()
     this._settimeoutindex = setTimeout(() => {
       const lastFinish = this._isFinish
       this._isFinish = this._tilesCache.isFinishZoom(this._transform.zoomInt, this.xstart, this.xend, this.ystart, this.yend)
@@ -74,7 +73,7 @@ export default class Painter {
     const screenX = tile.x * width + inXStart;
     const screenY = tile.y * width + inYStart;
     this._screen_canvas.draw(tile, screenX, screenY, width, width);
-    // this.drawDebuggerRect(tile.zoom, tile.x, tile.y, screenX, screenY, width, this._screen_canvas.getContext())
+    this.drawDebuggerRect(tile.zoom, tile.x, tile.y, screenX, screenY, width, this._screen_canvas.getContext())
   }
   drawDebuggerRect(z: number, x: number, y: number, screenX: number, screenY: number, width: number, ctx: CanvasRenderingContext2D) {
     ctx.beginPath();

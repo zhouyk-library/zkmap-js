@@ -51,7 +51,7 @@ class Transform {
     this._matrix = [256 * Math.pow(2, this._zoom) / (this._bound.xmax - this._bound.xmin) * this._bound.xscale, 0, 0, 256 * Math.pow(2, this._zoom) / (this._bound.ymax - this._bound.ymin) * this._bound.yscale, this.width / 2, this.height / 2]
     this.setCenter(this._center)
     this._ctx.setTransform(1, 0, 0, 1, 0, 0);
-    this.clearTransform()
+    this.initTransform()
   }
   get context(): Context {
     return this._context
@@ -99,7 +99,7 @@ class Transform {
     const dxe = dx / this._matrix[0]
     const dyf = dy / this._matrix[3]
     Utils.Matrix2D.translate(this._matrix, dxe, dyf)
-    this.clearTransform()
+    this.initTransform()
   }
   set anchorPoint(pixel: number[]) {
     this._anchorPoint = pixel
@@ -144,11 +144,18 @@ class Transform {
     const f1 = this._matrix[5], y1 = y, y2 = y1;
     const f = (y2 - d * (y1 - f1) - f1) / this._matrix[3];
     Utils.Matrix2D.multiply(this._matrix, Array.from([a, 0, 0, d, e, f]))
-    this.clearTransform()
+    this.initTransform()
   }
-  clearTransform() {
+  clearOutTransform() {
     this._ctx.fillStyle = "#010101";
-    this._ctx.clearRect(0, 0, this.width, this.height);
+    const screenBound: Bound = this._screenBound
+    this._ctx.fillRect(0, 0, screenBound.xmin, this.height);
+    this._ctx.fillRect(0, 0, this.width, screenBound.ymin);
+    this._ctx.fillRect(screenBound.xmax, 0, this.width, this.height);
+    this._ctx.fillRect(0, screenBound.ymax, this.width, this.height);
+  }
+  initTransform() {
+    this._ctx.fillStyle = "#010101";
     this._ctx.fillRect(0, 0, this.width, this.height);
     this.updateVisualBound();
   }
