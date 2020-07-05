@@ -1,4 +1,5 @@
 import Context from './context';
 import Render from './render';
 import Painter from './painter';
-export { Context, Render, Painter }
+import ScreenCanvas from './screen_canvas';
+export { Context, Render, Painter, ScreenCanvas }

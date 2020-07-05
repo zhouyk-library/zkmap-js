@@ -6,11 +6,12 @@ export default class TilesCache {
   constructor() {
     this._key2tile = new Map();
   }
-  add(z: number, x: number, y: number, url: string) {
+  add(z: number, x: number, y: number, url: string): Tile {
     const key: string = `${z}-${x}-${y}`
-    if (this._key2tile.has(key)) return
+    if (this._key2tile.has(key)) return this._key2tile.get(key)
     const tile: Tile = new Tile(z, x, y, url).load()
     this._key2tile.set(key, tile)
+    return tile;
   }
   get(z: number, x0: number, x1: number, y0: number, y1: number): Array<Tile> {
     if (this.historyZoom.lastIndexOf(z) === this.historyZoom.length - 1) {
@@ -26,7 +27,7 @@ export default class TilesCache {
     loadedTiles.sort(function (a: Tile, b: Tile) { return a.zoom - b.zoom })
     return loadedTiles
   }
-  isFinishZoom(z: number, x0: number, x1: number, y0: number, y1: number): Boolean {
+  isFinishZoom(z: number, x0: number, x1: number, y0: number, y1: number): boolean {
     const loadedTiles = []
     for (let ii = x0; ii < x1; ii++) {
       for (let jj = y0; jj < y1; jj++) {

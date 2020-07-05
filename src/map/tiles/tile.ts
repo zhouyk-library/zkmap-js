@@ -9,6 +9,7 @@ export default class Tile {
   private _controller: AbortController;
   private _image: HTMLImageElement | ImageBitmap;
   private _state: number = TileState.NONE;
+  private _done: (_: Tile) => void;
   constructor(z: number, x: number, y: number, url: string) {
     this._z = z
     this._x = x
@@ -20,6 +21,7 @@ export default class Tile {
     const blob: Blob = new window.Blob([new Uint8Array(data)], { type: 'image/png' });
     window.createImageBitmap(blob).then((imgBitmap) => {
       this._image = imgBitmap
+      this._done && this._done(this)
       this._state = TileState.OK
     }).catch(error =>
       this._state = TileState.ERROR
@@ -33,6 +35,7 @@ export default class Tile {
       this._state = TileState.ERROR
     };
     this._image.onload = () => {
+      this._done && this._done(this)
       this._state = TileState.OK
       URL.revokeObjectURL(image.src);
     };
@@ -56,8 +59,15 @@ export default class Tile {
           }
         })
       }
-    }).catch(error => console.log(error));
+    }).catch(error => {
+      this._state = TileState.ERROR
+      console.log(error)
+    });
     return this
+  }
+  then(done: (_: Tile) => void) {
+    this._done = done
+    this.isLoaded && this._done(this)
   }
   destroy() {
     this._controller.abort();
@@ -80,6 +90,9 @@ export default class Tile {
       keys.push(`${index}-${x}-${y}`)
     }
     return keys;
+  }
+  get key(): string {
+    return `${this._z}-${this._x}-${this._y}`
   }
   getChildrenKeys(): Array<String> {
     const keys: Array<String> = new Array()

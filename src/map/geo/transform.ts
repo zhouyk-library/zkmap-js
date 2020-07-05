@@ -147,12 +147,9 @@ class Transform {
     this.clearTransform()
   }
   clearTransform() {
-    this._ctx.save();
-    this._ctx.setTransform(1, 0, 0, 1, 0, 0);
     this._ctx.fillStyle = "#010101";
+    this._ctx.clearRect(0, 0, this.width, this.height);
     this._ctx.fillRect(0, 0, this.width, this.height);
-    this._ctx.stroke();
-    this._ctx.restore();
     this.updateVisualBound();
   }
   lngLat2Project(lngLat: number[]): number[] {

@@ -2,8 +2,8 @@ import { Handler, HandlerResult, EventHandlerManager } from '../types'
 import { Map } from '../../main/types'
 import { Point } from '../../geo/types'
 export default class MouseHandler implements Handler {
-  private _map:Map
-  private _handler:EventHandlerManager
+  private _map: Map
+  private _handler: EventHandlerManager
   private _enabled: boolean;
   private _active: boolean;
   private _start: Point;
@@ -20,16 +20,16 @@ export default class MouseHandler implements Handler {
     this._enabled = false;
   };
   isEnabled(): boolean { return !!this._enabled };
-  isActive(): boolean{ return this._active };
-  reset(): void{
+  isActive(): boolean { return this._active };
+  reset(): void {
     this._active = false;
     delete this._start
   };
-  mousedown(e: MouseEvent, point: Point):HandlerResult | void{
+  mousedown(e: MouseEvent, point: Point): HandlerResult | void {
     this._active = true
     this._start = point;
   };
-  mousemove(e: MouseEvent, point: Point):HandlerResult | void{
+  mousemove(e: MouseEvent, point: Point): HandlerResult | void {
     if (this._active) {
       const dragDelta = point.sub(this._start)
       this._start = point
@@ -39,7 +39,7 @@ export default class MouseHandler implements Handler {
       }
     }
   };
-  mouseup(e: MouseEvent, point: Point):HandlerResult | void{
+  mouseup(e: MouseEvent, point: Point): HandlerResult | void {
     this._active = false
   };
 }
