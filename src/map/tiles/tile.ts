@@ -2,6 +2,7 @@ import { TileState } from './types'
 const transparentPngUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQYV2NgAAIAAAUAAarVyFEAAAAASUVORK5CYII=';
 import Utils from '../utils'
 export default class Tile {
+  private _time: number;
   private _z: number;
   private _x: number;
   private _y: number;
@@ -19,6 +20,7 @@ export default class Tile {
   arrayBufferToImageBitmap(data: ArrayBuffer) {
     const blob: Blob = new window.Blob([new Uint8Array(data)], { type: 'image/png' });
     window.createImageBitmap(blob).then((imgBitmap) => {
+      this._time = Utils.Browser.now()
       this._image = imgBitmap
       this._state = TileState.OK
     }).catch(error =>
@@ -33,6 +35,7 @@ export default class Tile {
       this._state = TileState.ERROR
     };
     this._image.onload = () => {
+      this._time = Utils.Browser.now()
       this._state = TileState.OK
       URL.revokeObjectURL(image.src);
     };
@@ -94,4 +97,5 @@ export default class Tile {
   get x(): number { return this._x }
   get y(): number { return this._y }
   get image(): HTMLImageElement | ImageBitmap { return this._image }
+  get time():number { return this._time }
 }

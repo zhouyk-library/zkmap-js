@@ -149,7 +149,8 @@ class Transform {
   clearTransform(){
     this._ctx.save();
     this._ctx.setTransform(1, 0, 0, 1, 0, 0);
-    this._ctx.clearRect(0, 0, this.width, this.height);
+    this._ctx.fillStyle = "#000000";
+    this._ctx.fillRect(0, 0, this.width, this.height);
     this._ctx.restore()
     this.updateVisualBound()
   }
@@ -171,9 +172,9 @@ class Transform {
   screen2lngLat(pixel: number[]): number[]{
     return this.project2LngLat(this.screen2project(pixel))
   }
-  get default():Array<number> { return Utils.Matrix2D.setFromArray(new Array(),this._default) }
-  get tileZoom(): number{return this._tileZoom}
-  get scale(): number{return this._scale}
+  get default():Array<number> { return Utils.Matrix2D.setFromArray(new Array(),this._default); }
+  get tileZoom(): number{ return this._tileZoom; }
+  get scale(): number{ return this._scale; }
   get projection(): Projection { return this._projection; }
   set projection(projection: Projection) { this._projection = projection; }
   zoomScale(zoom: number) { return Math.pow(2, zoom); }
