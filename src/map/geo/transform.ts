@@ -150,7 +150,7 @@ class Transform {
     this._ctx.save();
     this._ctx.setTransform(1, 0, 0, 1, 0, 0);
     this._ctx.fillStyle = "#000000";
-    this._ctx.fillRect(0, 0, this.width, this.height);
+    this._ctx.fillRect(-1, -1, this.width+2, this.height+2);
     this._ctx.restore()
     this.updateVisualBound()
   }

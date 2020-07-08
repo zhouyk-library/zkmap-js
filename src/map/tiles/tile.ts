@@ -96,6 +96,13 @@ export default class Tile {
   get zoom(): number { return this._z }
   get x(): number { return this._x }
   get y(): number { return this._y }
-  get image(): HTMLImageElement | ImageBitmap { return this._image }
+  get image(): HTMLImageElement | ImageBitmap {
+    if(this.isLoaded){
+      return this._image
+    }else{
+      return new window.Image();
+    }
+  }
   get time():number { return this._time }
+  get key():string { return this._z+'-'+this._x+'-'+this._y}
 }
