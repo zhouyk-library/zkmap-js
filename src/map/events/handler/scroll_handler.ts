@@ -39,7 +39,6 @@ export default class ScrollHandler implements Handler {
     let value = e.deltaMode === window.WheelEvent.DOM_DELTA_LINE ? e.deltaY * 40 : e.deltaY;
     const now = Utils.Browser.now(), timeDelta = now - (this._lastEventTime || 0);
     this._lastEventTime = now;
-    // console.error(timeDelta)
     this._delta -= value;
     if (!this._active) {
         this._start(e);
@@ -58,7 +57,6 @@ export default class ScrollHandler implements Handler {
   }
   _onScrollFrame():HandlerResult {
     if (!this.isActive()) return;
-    this.console()
     const tr = this._map.transform;
     if (this._delta !== 0) {
       let scale =  this._delta / 500
@@ -67,7 +65,6 @@ export default class ScrollHandler implements Handler {
           this._easing = this._smoothOutEasing(200);
       this._delta = 0;
     }
-    this.console()
     const targetZoom = typeof this._targetZoom === 'number' ? this._targetZoom : tr.zoom;
     const startZoom = this._startZoom;
     const easing = this._easing;
@@ -78,7 +75,6 @@ export default class ScrollHandler implements Handler {
       const t = Math.min((Utils.Browser.now() - this._lastEventTime) / 200, 1);
       const k = easing(t);
       zoom = (targetZoom - startZoom) * k + startZoom;
-      this.console([k,targetZoom,zoom])
       if (t >= 1) {
           finished = true;
       }
@@ -91,7 +87,6 @@ export default class ScrollHandler implements Handler {
       this._active = false;
       this._handler.triggerRenderFrame();
       this._zooming = false;
-      this.console([finished])
     }
     return {
       renderFrame: !finished,
@@ -117,8 +112,5 @@ export default class ScrollHandler implements Handler {
       easing
     };
     return easing;
-  }
-  console(params:any[] = []){
-    // console.log(`active:${this._active},delta:${this._delta},startZoom:${this._startZoom},params:${params},`)
   }
 }
