@@ -74,7 +74,7 @@ export default class ScrollHandler implements Handler {
     if (startZoom && easing) {
       const t = Math.min((Utils.Browser.now() - this._lastEventTime) / 200, 1);
       const k = easing(t);
-      zoom = (targetZoom - startZoom) * k + startZoom;
+      zoom = (targetZoom - startZoom) * k + startZoom + 0.00000001;
       if (t >= 1) {
           finished = true;
       }

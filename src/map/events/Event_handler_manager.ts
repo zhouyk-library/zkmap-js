@@ -65,6 +65,7 @@ export default class EventHandlerManager {
       if (handler[type]) {
         data = handler[type](e, points);
         if (data) {
+          console.log(data.around,data.targetZoom,data.dragDelta)
           if (!!data.around) this._map.transform.anchorPoint = data.around.toArray()
           if (!!data.targetZoom) this._map.transform.zoom = data.targetZoom
           if (!!data.dragDelta) this._map.transform.moveCenter(data.dragDelta.toArray())
