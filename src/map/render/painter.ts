@@ -41,12 +41,13 @@ export default class Painter {
           // this._tilesCache.add(this._transform.zoomInt,inexx,inexy,`http://192.168.1.149:39999/map/rizhao/osm/${this._transform.zoomInt}/${inexx}/${inexy}.png`)
           // this._tilesCache.add(this._transform.zoomInt, inexx, inexy, `http://webrd01.is.autonavi.com/appmaptile?x=${inexx}&y=${inexy}&z=${this._transform.zoomInt}&lang=zh_cn&size=1&scale=1&style=8`)
           .then((tile: Tile) => {
-            this.render()
+            this.renderTile(tile)
           })
       }
     }
     this._tilesCache.clearNoneTiles(this._transform.zoomInt)
   }
+
   render() {
     const screenBound: Bound = this._transform.screenBound
     const inXStart = screenBound.xmin, inYStart = screenBound.ymin
@@ -54,18 +55,19 @@ export default class Painter {
       const width =  256 * Math.pow(2, this._transform.zoom - tile.zoom)
       const screenX = tile.x * width + inXStart;
       const screenY = tile.y * width + inYStart;
-      if(this.viewImages.includes(tile.key)){
+      console.log('cache:' + tile.key);
+      if(this.viewImages.includes(tile.key)) {
         this.drawImage(screenX,screenY,width,width,tile)
-      }else{
+      } else {
         this.drawImageOpacity(screenX,screenY,width,width,tile)
-        tile.isLoaded && this.viewImages.push(tile.key)
+        this.viewImages.push(tile.key)
       }
-      this.drawDebuggerRect(tile.zoom, tile.x, tile.y, screenX, screenY, width, this._ctx);
     });
   }
   
   drawImage(screenX:number,screenY:number,height:number,width:number,tile: Tile){
     this._ctx.drawImage(tile.image, screenX, screenY, width, height);
+    this.drawDebuggerRect(tile.zoom, tile.x, tile.y, screenX, screenY, width, this._ctx);
   }
   
   drawImageOpacity(screenX:number,screenY:number,height:number,width:number,tile: Tile){
@@ -80,29 +82,32 @@ export default class Painter {
     }
   }
 
-  getTileOpacity(tile:Tile) {
+  getTileOpacity(tile: Tile) {
     if (!tile.time) {
         return 1;
     }
     return Math.min(1, (Utils.Browser.now() - tile.time) / (1000 / 60 * 10));
   }
+
   renderTile(tile: Tile) {
-    const screenBound: Bound = this._transform.screenBound
-    const inXStart = screenBound.xmin, inYStart = screenBound.ymin
-    const width = 256 * Math.pow(2, this._transform.zoom - tile.zoom)
+    console.log('backf:' + tile.key);
+    const screenBound: Bound = this._transform.screenBound;
+    const inXStart = screenBound.xmin, inYStart = screenBound.ymin;
+    const width = 256 * Math.pow(2, this._transform.zoom - tile.zoom);
     const screenX = tile.x * width + inXStart;
     const screenY = tile.y * width + inYStart;
-    this.drawImageOpacity(screenX,screenY,width,width,tile)
+    this.drawImage(screenX,screenY,width,width,tile);
   }
+
   drawDebuggerRect(z: number, x: number, y: number, screenX: number, screenY: number, width: number, ctx: CanvasRenderingContext2D) {
     ctx.beginPath();
     ctx.strokeStyle = "#ff9999";
     ctx.fillStyle = "#ff9999";
-    ctx.lineWidth = 1
+    ctx.lineWidth = 1;
     ctx.rect(screenX, screenY, width, width);
-    ctx.font = `${30}px Verdana`;
+    ctx.font = '30px Verdana';
     ctx.fillText(`(${z},${x},${y})`, screenX + width / 2 - 100, screenY + width / 2 - 15, 200);
-    ctx.closePath()
+    ctx.closePath();
     ctx.stroke();
   }
 }
