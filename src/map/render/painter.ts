@@ -16,7 +16,7 @@ export default class Painter {
     this._map = map;
     this._transform = this._map.transform
     this._ctx = ctx
-    this._tilesCache = new TilesCache()
+    this._tilesCache = new TilesCache(map)
   }
   computed() {
     this.viewImages.splice(0);
@@ -33,16 +33,10 @@ export default class Painter {
     this.yend = Math.ceil(allCount / countY * (Math.min(inYEnd, outYEnd) - inYStart))
     for (let inexx = this.xstart; inexx < this.xend; inexx++) {
       for (let inexy = this.ystart; inexy < this.yend; inexy++) {
-        // this._tilesCache.add(this._transform.zoomInt,inexx,inexy,`http://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${this._transform.zoomInt}/${inexy}/${inexx}`)
-        // this._tilesCache.add(this._transform.zoomInt,inexx,inexy,`http://localhost:39999/map/rizhao/google/${this._transform.zoomInt}/${inexx}/${inexy}.jpeg`)
-        this._tilesCache.add(this._transform.zoomInt, inexx, inexy, `http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x=${inexx}&y=${inexy}&z=${this._transform.zoomInt}`)
-        // this._tilesCache.add(this._transform.zoomInt, inexx, inexy, `http://rt1.map.gtimg.com/realtimerender?z=${this._transform.zoomInt}&x=${inexx}&y=${Math.pow(2, this._transform.zoomInt) - 1 - inexy}&type=vector&style=0&tms=true`)
-          // this._tilesCache.add(this._transform.zoomInt,inexx,inexy,`https://tile.openstreetmap.org/${this._transform.zoomInt}/${inexx}/${inexy}.png`)
-          // this._tilesCache.add(this._transform.zoomInt,inexx,inexy,`http://192.168.1.149:39999/map/rizhao/osm/${this._transform.zoomInt}/${inexx}/${inexy}.png`)
-          // this._tilesCache.add(this._transform.zoomInt, inexx, inexy, `http://webrd01.is.autonavi.com/appmaptile?x=${inexx}&y=${inexy}&z=${this._transform.zoomInt}&lang=zh_cn&size=1&scale=1&style=8`)
-          .then((tile: Tile) => {
-            this.renderTile(tile)
-          })
+        this._tilesCache.add(this._transform.zoomInt, inexx, inexy, this._map.getUrl(this._transform.zoomInt, inexx, inexy))
+        .then((tile: Tile) => {
+          this.renderTile(tile)
+        })
       }
     }
     this._tilesCache.clearNoneTiles(this._transform.zoomInt)

@@ -5,6 +5,7 @@ import { Cancelable } from '../utils/types';
 import { Transform } from '../geo/types';
 import { Render } from '../render/types';
 import { TaskQueue,TaskID } from '../queue/types';
+import { URL } from '../com/types';
 import Utils from '../utils'
 
 class Map extends Camera {
@@ -13,6 +14,7 @@ class Map extends Camera {
   _render: Render;
   private _frame: Cancelable;
   private _options: MapOptions;
+  private _url: URL;
   private _renderTaskQueue: TaskQueue;
   private _canvasContainer: HTMLElement;
   private _eventHandlerManager: EventHandlerManager;
@@ -42,6 +44,7 @@ class Map extends Camera {
     container.appendChild(canvasContainer);
     const transform = new Transform(canvas, options.minZoom, options.maxZoom, options.type);
     super(transform);
+    this._url = new URL('','')
     const render = new Render(this);
     this._options = options;
     this._renderTaskQueue = new TaskQueue();
@@ -55,6 +58,9 @@ class Map extends Camera {
     this.triggerRepaint()
     this.on('refresh', this.triggerRepaint)
     this._render.computed();
+  }
+  getUrl(z: number, x: number, y: number): string{
+    return this._url.getUrl(z,x,y)
   }
   getCanvasContainer(): HTMLElement {
     return this._canvasContainer
