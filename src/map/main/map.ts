@@ -70,7 +70,7 @@ class Map extends Camera {
   }
   
   _requestRenderFrame(callback: (_:any) => void): TaskID {
-    this._update();
+    // this._update();
     return this._renderTaskQueue.add(callback);
   }
   _update(updateStyle?: boolean) {
@@ -122,12 +122,13 @@ class Map extends Camera {
     this._canvas.removeEventListener("wheel", this._onWheel);
   }
   triggerRepaint() {
-    // this._frame = Utils.Browser.requestAnimationFrame((paintStartTimeStamp: number) => {
-    //   this._frame = null;
-    //   this._render.render();
-    //   this.triggerRepaint()
-    //   return this
-    // });
+    this._frame = Utils.Browser.requestAnimationFrame((paintStartTimeStamp: number) => {
+      this._frame = null;
+      this._renderTaskQueue.run()
+      this._render.render();
+      this.triggerRepaint()
+      return this
+    });
   }
 }
 

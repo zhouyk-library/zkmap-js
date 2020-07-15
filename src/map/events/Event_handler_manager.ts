@@ -73,9 +73,9 @@ export default class EventHandlerManager {
           if (data.renderFrame) {
             this.triggerRenderFrame()
           }
-          if (handlerName === 'mousePan') {
-            this._map._update()
-          }
+          // if (handlerName === 'mousePan') {
+          //   this._map._update()
+          // }
         }
       }
     }
