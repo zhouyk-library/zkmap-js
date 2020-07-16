@@ -13,3 +13,7 @@ export function bindAll(fns: Array<string>, context: Object): void {
     context[fn] = context[fn].bind(context);
   });
 }
+
+export function isNil(obj:any):boolean {
+  return obj == null;
+}

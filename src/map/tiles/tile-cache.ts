@@ -14,7 +14,7 @@ export default class TilesCache {
     if (this._key2tile.has(key)) return this._key2tile.get(key)
     const tile: Tile = new Tile(z, x, y, url).load()
     this._key2tile.set(key, tile)
-    // isPc && this.addPCTile(tile)
+    isPc && this.addPCTile(tile)
     return tile
   }
   get(z: number, x0: number, x1: number, y0: number, y1: number): Array<Tile> {
@@ -83,19 +83,19 @@ export default class TilesCache {
           this.add(z,x1,y1, this._map.getUrl(z,x1,y1),true)
         }
       }
-      // for (let index = 1; index < 2; index++) {
-      //   const  z = zoom + index
-      //   if(z<=22){
-      //     const y1 = Math.floor(y * 2)
-      //     const x1 = Math.floor(x * 2)
-      //     const y2 = Math.floor(y * 2 + 1)
-      //     const x2 = Math.floor(x * 2 + 1)
-      //     this.add(z,x1,y1, this._map.getUrl(z,x1,y1),true)
-      //     this.add(z,x2,y1, this._map.getUrl(z,x2,y1),true)
-      //     this.add(z,x1,y2, this._map.getUrl(z,x1,y2),true)
-      //     this.add(z,x2,y2, this._map.getUrl(z,x2,y2),true)
-      //   }
-      // }
+      for (let index = 1; index < 2; index++) {
+        const  z = zoom + index
+        if(z<=22){
+          const y1 = Math.floor(y * 2)
+          const x1 = Math.floor(x * 2)
+          const y2 = Math.floor(y * 2 + 1)
+          const x2 = Math.floor(x * 2 + 1)
+          this.add(z,x1,y1, this._map.getUrl(z,x1,y1),true)
+          this.add(z,x2,y1, this._map.getUrl(z,x2,y1),true)
+          this.add(z,x1,y2, this._map.getUrl(z,x1,y2),true)
+          this.add(z,x2,y2, this._map.getUrl(z,x2,y2),true)
+        }
+      }
     }
   }
   private getTile(z: number, x: number, y: number):Tile {
@@ -122,7 +122,7 @@ export default class TilesCache {
     this.clearHandleTime = setTimeout(() => {
       const deleteArray: Array<String> = new Array();
       this._key2tile.forEach((value: Tile, key: String, map: Map<String, Tile>) => {
-        value.zoom !== z && value.state == TileState.NONE && deleteArray.push(key)
+        (value.zoom - z > 1 || z - value.zoom > 6) && value.state == TileState.NONE && deleteArray.push(key)
       })
       deleteArray.forEach(item => {
         this._key2tile.get(item).destroy()

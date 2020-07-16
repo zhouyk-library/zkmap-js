@@ -9,6 +9,7 @@ export default class Tile {
   private _url: string;
   private _controller: AbortController;
   private _image: HTMLImageElement | ImageBitmap;
+  private _canvas: HTMLCanvasElement;
   private _state: number = TileState.NONE;
   private _done: (_: Tile) => void;
   constructor(z: number, x: number, y: number, url: string) {
@@ -23,11 +24,17 @@ export default class Tile {
     window.createImageBitmap(blob).then((imgBitmap) => {
       this._time = Utils.Browser.now()
       this._image = imgBitmap
+      this.covertCanvas()
       this._done && this._done(this)
       this._state = TileState.OK
     }).catch(error =>
       this._state = TileState.ERROR
     );
+  }
+  covertCanvas():void{
+    const canvas = Utils.Canvas2D.createCanvas(256, 256);
+    Utils.Canvas2D.image(canvas.getContext('2d'), this._image, 0, 0, 256, 256);
+    this._canvas = canvas;
   }
   arrayBufferToImage(data: ArrayBuffer) {
     const URL = window.URL;
@@ -38,6 +45,7 @@ export default class Tile {
     };
     this._image.onload = () => {
       this._time = Utils.Browser.now()
+      this.covertCanvas()
       this._done && this._done(this)
       this._state = TileState.OK
       URL.revokeObjectURL(image.src);
@@ -117,7 +125,7 @@ export default class Tile {
   get zoom(): number { return this._z }
   get x(): number { return this._x }
   get y(): number { return this._y }
-  get image(): HTMLImageElement | ImageBitmap { return this._image }
+  get image(): HTMLImageElement | ImageBitmap | HTMLCanvasElement { return this._canvas ||this._image }
   get time():number { return this._time }
   get key():string { return this._z+'-'+this._x+'-'+this._y}
 }

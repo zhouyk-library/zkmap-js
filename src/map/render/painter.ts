@@ -34,9 +34,9 @@ export default class Painter {
     for (let inexx = this.xstart; inexx < this.xend; inexx++) {
       for (let inexy = this.ystart; inexy < this.yend; inexy++) {
         this._tilesCache.add(this._transform.zoomInt, inexx, inexy, this._map.getUrl(this._transform.zoomInt, inexx, inexy))
-        .then((tile: Tile) => {
-          this.renderTile(tile)
-        })
+        // .then((tile: Tile) => {
+        //   this.renderTile(tile)
+        // })
       }
     }
     this._tilesCache.clearNoneTiles(this._transform.zoomInt)
@@ -59,12 +59,12 @@ export default class Painter {
     });
   }
   
-  drawImage(screenX:number,screenY:number,height:number,width:number,tile: Tile){
+  drawImage(screenX:number,screenY:number,height:number,width:number,tile: Tile) {
     this._ctx.drawImage(tile.image, screenX, screenY, width, height);
     this.drawDebuggerRect(tile.zoom, tile.x, tile.y, screenX, screenY, width, this._ctx);
   }
   
-  drawImageOpacity(screenX:number,screenY:number,height:number,width:number,tile: Tile){
+  drawImageOpacity(screenX:number,screenY:number,height:number,width:number,tile: Tile) {
     const opacity = tile.isLoaded ? this.getTileOpacity(tile) : 0
     const alpha = this._ctx.globalAlpha;
     if (opacity < 1) {
