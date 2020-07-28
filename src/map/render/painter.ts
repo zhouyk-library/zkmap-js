@@ -60,7 +60,7 @@ export default class Painter {
   }
   
   drawImage(screenX:number,screenY:number,height:number,width:number,tile: Tile) {
-    this._ctx.drawImage(tile.image, screenX, screenY, width, height);
+    this._ctx.drawImage(tile.image, Math.floor(screenX), Math.floor(screenY), Math.floor(width), Math.floor(height));
     this.drawDebuggerRect(tile.zoom, tile.x, tile.y, screenX, screenY, width, this._ctx);
   }
   
