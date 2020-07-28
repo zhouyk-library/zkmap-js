@@ -5,6 +5,12 @@ import RasterTile from './raster/raster_tile';
 import Source from './source';
 export {Source,RasterSource,TilesCache,RasterTile}
 export enum TileState{NONE=0,LOADING=2,OK=1,ERROR=-1}
+export type SourceResult = {
+  cur:Tile[],
+  parent:Tile[],
+  child:Tile[]
+}
+
 export interface Tile {
   load():Tile | any;
   then(done: (_: Tile| any) => void):void;
