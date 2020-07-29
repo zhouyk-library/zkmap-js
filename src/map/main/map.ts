@@ -13,6 +13,8 @@ import Utils from '../utils'
 class Map extends Camera {
   private _container: HTMLElement;
   private _canvas: HTMLCanvasElement;
+  private _sources:Sources;
+  private _layers:Layers;
   _render: Render;
   private _frame: Cancelable;
   private _options: MapOptions;
@@ -47,6 +49,8 @@ class Map extends Camera {
     const transform = new Transform(canvas, options.minZoom, options.maxZoom, options.type);
     super(transform);
     this._url = new URL('','')
+    this._sources = new Sources()
+    this._layers = new Layers(this._sources)
     const render = new Render(this);
     this._options = options;
     this._renderTaskQueue = new TaskQueue();

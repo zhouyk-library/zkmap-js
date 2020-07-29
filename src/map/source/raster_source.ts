@@ -1,4 +1,5 @@
-import { ISource,TilesCache, RasterTile,Tile,SourceResult } from './types'
+import { ISource,TilesCache, RasterTile,Tile,SourceResult,SourceOption } from './types'
+import { URL } from '../com/types';
 export default class RasterSource implements ISource {
   private _id: String;
   private _tilesCache :TilesCache;
@@ -6,8 +7,10 @@ export default class RasterSource implements ISource {
   private _lstParentTile: Array<RasterTile>;
   private _lstChildTile: Array<RasterTile>;
   private _lstCurTile: Array<RasterTile>;
-  constructor(id:String) {
-    this._id = id
+  private _url: URL;
+  constructor(option:SourceOption) {
+    this._id = option.id
+    this._url = new URL(option.url,option.scheme)
     this._tilesCache = new TilesCache(1000)
     this._mapLoadingTile = new Map<String,RasterTile>()
     this._lstParentTile = new Array<RasterTile>()
@@ -17,12 +20,11 @@ export default class RasterSource implements ISource {
   get id():String {
     return this._id;
   }
-  refresh(): void{
-  }
+  refresh(): void{}
   getData(z: number, xStart: number, xEnd: number, yStart: number, yEnd: number): SourceResult{
     for (let x = xStart; x < xEnd; x++) {
       for (let y = yStart; y < yEnd; y++) {
-        const url = ""
+        const url = this._url.getUrl(x,y,z)
         if(this._mapLoadingTile.has(url)){
           continue;
         }
@@ -55,7 +57,7 @@ export default class RasterSource implements ISource {
         if(zoom>=0){
           const y1 = Math.floor(y / Math.pow(2,index))
           const x1 = Math.floor(x / Math.pow(2,index))
-          const url:string = `${z}-${x1}-${y1}`
+          const url:string = this._url.getUrl(x,y,z)
           if(this._tilesCache.has(url)){
             const rasterTile:RasterTile = <RasterTile>this._tilesCache.get(url)
             rasterTiles.push(rasterTile)
@@ -76,20 +78,24 @@ export default class RasterSource implements ISource {
           const x1 = Math.floor(x * 2)
           const y2 = Math.floor(y * 2 + 1)
           const x2 = Math.floor(x * 2 + 1)
-          if(this._tilesCache.has(`${zoom}-${x1}-${y1}`)){
-            const rasterTile:RasterTile = <RasterTile>this._tilesCache.get(`${zoom}-${x1}-${y1}`)
+          var url:string = this._url.getUrl(x1,y1,zoom)
+          if(this._tilesCache.has(url)){
+            const rasterTile:RasterTile = <RasterTile>this._tilesCache.get(url)
             rasterTiles.push(rasterTile)
           }
-          if(this._tilesCache.has(`${zoom}-${x2}-${y1}`)){
-            const rasterTile:RasterTile = <RasterTile>this._tilesCache.get(`${zoom}-${x2}-${y1}`)
+          url = this._url.getUrl(x2,y1,zoom)
+          if(this._tilesCache.has(url)){
+            const rasterTile:RasterTile = <RasterTile>this._tilesCache.get(url)
             rasterTiles.push(rasterTile)
           }
-          if(this._tilesCache.has(`${zoom}-${x1}-${y2}`)){
-            const rasterTile:RasterTile = <RasterTile>this._tilesCache.get(`${zoom}-${x1}-${y2}`)
+          url = this._url.getUrl(x1,y2,zoom)
+          if(this._tilesCache.has(url)){
+            const rasterTile:RasterTile = <RasterTile>this._tilesCache.get(url)
             rasterTiles.push(rasterTile)
           }
-          if(this._tilesCache.has(`${zoom}-${x2}-${y2}`)){
-            const rasterTile:RasterTile = <RasterTile>this._tilesCache.get(`${zoom}-${x2}-${y2}`)
+          url = this._url.getUrl(x2,y2,zoom)
+          if(this._tilesCache.has(url)){
+            const rasterTile:RasterTile = <RasterTile>this._tilesCache.get(url)
             rasterTiles.push(rasterTile)
           }
         }

@@ -33,7 +33,8 @@ export interface ISource {
 }
 
 export type SourceOption = {
-  id:String;
-  type:String;
-  url?:String;
+  id:string;
+  type:string;
+  url?:string;
+  scheme?: string
 }

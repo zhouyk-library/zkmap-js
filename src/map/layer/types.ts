@@ -1,18 +1,19 @@
 
 import RasterLayer from './raster_Layer';
 import Layers from './layers';
+import {ISource} from '../source/types'
 export {RasterLayer,Layers}
 export interface ILayer {
-  id: String;
+  id: string;
   enable(): void;
   disable(): void;
-  render(): void;
+  render(source:ISource): void;
   getImage(): HTMLCanvasElement;
-  getSourceId():String;
-  setSourceId(sourceId :String): void;
+  getSourceId():string;
+  setSourceId(sourceId :string): void;
 }
 export type LayerOption = {
-  id:String;
-  type:String;
-  source:String;
+  id:string;
+  type:string;
+  source:string;
 }
