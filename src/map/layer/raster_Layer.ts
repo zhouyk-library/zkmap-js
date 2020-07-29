@@ -1,16 +1,19 @@
 import {ILayer,LayerOption} from './types'
 import {ISource} from '../source/types'
 import Utils from '../utils'
+import {Transform} from '../geo/types';
 export default class RasterLayer implements ILayer {
   private _enable: boolean = false;
   private _id: string;
+  private _transform: Transform;
   private _sourceId: string;
   private _canvas: HTMLCanvasElement;
   private _ctx:CanvasRenderingContext2D | WebGLRenderingContext
-  constructor(option:LayerOption) {
+  constructor(option:LayerOption,transform: Transform) {
+    this._transform = transform
     this._id = option.id
     this._sourceId = option.source
-    const canvas = Utils.Canvas2D.createCanvas(256, 256);
+    const canvas = Utils.Canvas2D.createCanvas(transform.height, transform.width);
     this._canvas = canvas;
     this._ctx = canvas.getContext('2d')
     this._enable = true;

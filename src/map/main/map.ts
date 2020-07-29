@@ -50,7 +50,7 @@ class Map extends Camera {
     super(transform);
     this._url = new URL('','')
     this._sources = new Sources()
-    this._layers = new Layers(this._sources)
+    this._layers = new Layers(this._sources,this)
     const render = new Render(this);
     this._options = options;
     this._renderTaskQueue = new TaskQueue();
@@ -74,16 +74,18 @@ class Map extends Camera {
     this.transform.resize(this._container.clientWidth, this._container.clientHeight)
   }
   addSource(sourceOption:SourceOption):String {
+    this._sources.addCreatSource(sourceOption)
     return sourceOption.id
   }
-  removeSource(sourceId:String){
-
+  removeSource(sourceId:string){
+    this._sources.remove(sourceId)
   }
-  addLayer(layerOption:LayerOption,layerId?:String):String {
+  addLayer(layerOption:LayerOption,layerId?:string):String {
+    this._layers.addCreatLayer(layerOption,layerId)
     return layerOption.id
   }
-  removeLayer(layerId:String){
-    
+  removeLayer(layerId:string){
+    this._layers.remove(layerId)
   }
   _requestRenderFrame(callback: (_:any) => void): TaskID {
     // this._update();

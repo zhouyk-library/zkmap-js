@@ -25,4 +25,8 @@ export default class Sources{
   getSource(id:string):ISource{
     return this._sources.get(id)
   }
+  remove(id:string):Sources{
+    this._sources.delete(id)
+    return this;
+  }
 }
