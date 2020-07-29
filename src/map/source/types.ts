@@ -1,14 +1,13 @@
-
 import RasterSource from './raster_source';
+import Sources from './sources';
 import TilesCache from './tile_cache';
 import RasterTile from './raster/raster_tile';
-import Source from './source';
-export {Source,RasterSource,TilesCache,RasterTile}
+export {RasterSource,TilesCache,RasterTile,Sources}
 export enum TileState{NONE=0,LOADING=2,OK=1,ERROR=-1}
 export type SourceResult = {
-  cur:Tile[],
-  parent:Tile[],
-  child:Tile[]
+  tile_cur?:Tile[],
+  tile_parent?:Tile[],
+  tile_child?:Tile[]
 }
 
 export interface Tile {
@@ -25,4 +24,16 @@ export interface Tile {
   time:number;
   xyz:string;
   id:string;
+}
+
+export interface ISource {
+  id: String;
+  refresh(): void;
+  getData(z: number, x0: number, x1: number, y0: number, y1: number): any;
+}
+
+export type SourceOption = {
+  id:String;
+  type:String;
+  url?:String;
 }

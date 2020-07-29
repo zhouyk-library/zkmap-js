@@ -1,6 +1,8 @@
 import Camera from './camera';
 import { Event, EventHandlerManager } from '../events/types';
 import { MapOptions } from './types';
+import { Sources,SourceOption } from '../source/types';
+import { Layers,LayerOption } from '../layer/types';
 import { Cancelable } from '../utils/types';
 import { Transform } from '../geo/types';
 import { Render } from '../render/types';
@@ -52,7 +54,6 @@ class Map extends Camera {
     this._container = container
     this._canvasContainer = canvasContainer
     this._eventHandlerManager = new EventHandlerManager(this)
-    this._bind()
     this.resize();
     this._render = render;
     this.triggerRepaint()
@@ -68,7 +69,18 @@ class Map extends Camera {
   resize(eventData?: Object) {
     this.transform.resize(this._container.clientWidth, this._container.clientHeight)
   }
-  
+  addSource(sourceOption:SourceOption):String {
+    return sourceOption.id
+  }
+  removeSource(sourceId:String){
+
+  }
+  addLayer(layerOption:LayerOption,layerId?:String):String {
+    return layerOption.id
+  }
+  removeLayer(layerId:String){
+    
+  }
   _requestRenderFrame(callback: (_:any) => void): TaskID {
     // this._update();
     return this._renderTaskQueue.add(callback);
@@ -80,46 +92,6 @@ class Map extends Camera {
       this._render.render();
       return this
     });
-  }
-  _bind() {
-    this._canvas.addEventListener("click", this._onClick.bind(this));
-    this._canvas.addEventListener("dblclick", this._onDoubleClick.bind(this));
-    this._canvas.addEventListener("mousedown", this._onMouseDown.bind(this));
-    this._canvas.addEventListener("mousemove", this._onMouseMove.bind(this));
-    this._canvas.addEventListener("mouseup", this._onMouseUp.bind(this));
-    this._canvas.addEventListener("wheel", this._onWheel.bind(this));
-  }
-  _onClick(event) {
-    this.fire(new Event("click", event))
-  }
-
-  _onDoubleClick(event) {
-    this.fire(new Event("dblclick", event))
-  }
-
-  _onMouseDown(event) {
-    this.fire(new Event("mousedown", event))
-  }
-
-  _onMouseMove(event) {
-    this.fire(new Event("mousemove", event))
-  }
-
-  _onMouseUp(event) {
-    this.fire(new Event("mouseup", event))
-  }
-
-  _onWheel(event) {
-    this.fire(new Event("wheel", event))
-  }
-
-  destroy() {
-    this._canvas.removeEventListener("click", this._onClick);
-    this._canvas.removeEventListener("dblclick", this._onDoubleClick);
-    this._canvas.removeEventListener("mousedown", this._onMouseDown);
-    this._canvas.removeEventListener("mousemove", this._onMouseMove);
-    this._canvas.removeEventListener("mouseup", this._onMouseUp);
-    this._canvas.removeEventListener("wheel", this._onWheel);
   }
   triggerRepaint() {
     this._frame = Utils.Browser.requestAnimationFrame((paintStartTimeStamp: number) => {
