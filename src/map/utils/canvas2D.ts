@@ -12,6 +12,10 @@ export function createCanvas(width:number, height:number, canvasClass?:any) :HTM
   return canvas;
 }
 
+export function clearRect(ctx:CanvasRenderingContext2D, x: number, y: number, w: number, h: number) :void {
+  ctx.clearRect(x, y, w, h);
+}
+
 export function image(ctx:CanvasRenderingContext2D, img:CanvasImageSource, x:number, y:number, width:number, height:number) {
   try {
       if (Utils.Number.isNumber(width) && Utils.Number.isNumber(height)) {

@@ -29,7 +29,7 @@ export interface Tile {
 export interface ISource {
   id: String;
   refresh(): void;
-  getData(z: number, x0: number, x1: number, y0: number, y1: number): any;
+  getData(z: number, xStart: number, xEnd: number, yStart: number, yEnd: number): SourceResult;
 }
 
 export type SourceOption = {

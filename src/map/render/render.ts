@@ -30,6 +30,6 @@ export default class Render {
     this._painter.render();
   }
   computed() {
-    this._painter.computed();
+    // this._painter.computed();
   }
 }

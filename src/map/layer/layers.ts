@@ -1,21 +1,25 @@
 import {ILayer,LayerOption,RasterLayer} from './types'
+import { Transform } from '../geo/types';
 import {Sources,ISource} from '../source/types'
 import { Map as Zkmap } from '../main/types';
 export default class Layers{
   private _map: Zkmap;
+  private _transform: Transform;
   private _layers:Map<string,ILayer>;
   private _order:Array<string>;
   private _sources:Sources;
   constructor(sources:Sources, map: Zkmap) {
     this._map = map;
+    this._transform = this._map.transform
     this._layers = new Map<string,ILayer>()
+    this._order = new Array<string>()
     this._sources = sources
   }
   addCreatLayer(option:LayerOption,layerId?:string):ILayer{
     var layer:ILayer = null;
     switch (option.type) {
       case "raster":
-        layer = new RasterLayer(option,this._map.transform);
+        layer = new RasterLayer(option,this._transform);
         break;
       default:
         break;
@@ -53,6 +57,7 @@ export default class Layers{
       }
       const source:ISource = this._sources.getSource(sourceId)
       layer.render(source)
+      layer.draw()
     })
   }
 }

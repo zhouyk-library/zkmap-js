@@ -10,6 +10,7 @@ export interface ILayer {
   render(source:ISource): void;
   getImage(): HTMLCanvasElement;
   getSourceId():string;
+  draw():void
   setSourceId(sourceId :string): void;
 }
 export type LayerOption = {

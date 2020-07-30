@@ -24,7 +24,7 @@ export default class RasterSource implements ISource {
   getData(z: number, xStart: number, xEnd: number, yStart: number, yEnd: number): SourceResult{
     for (let x = xStart; x < xEnd; x++) {
       for (let y = yStart; y < yEnd; y++) {
-        const url = this._url.getUrl(x,y,z)
+        const url = this._url.getUrl(z,x,y)
         if(this._mapLoadingTile.has(url)){
           continue;
         }
@@ -57,7 +57,7 @@ export default class RasterSource implements ISource {
         if(zoom>=0){
           const y1 = Math.floor(y / Math.pow(2,index))
           const x1 = Math.floor(x / Math.pow(2,index))
-          const url:string = this._url.getUrl(x,y,z)
+          const url:string = this._url.getUrl(z,x,y)
           if(this._tilesCache.has(url)){
             const rasterTile:RasterTile = <RasterTile>this._tilesCache.get(url)
             rasterTiles.push(rasterTile)
@@ -78,22 +78,22 @@ export default class RasterSource implements ISource {
           const x1 = Math.floor(x * 2)
           const y2 = Math.floor(y * 2 + 1)
           const x2 = Math.floor(x * 2 + 1)
-          var url:string = this._url.getUrl(x1,y1,zoom)
+          var url:string = this._url.getUrl(zoom,x1,y1)
           if(this._tilesCache.has(url)){
             const rasterTile:RasterTile = <RasterTile>this._tilesCache.get(url)
             rasterTiles.push(rasterTile)
           }
-          url = this._url.getUrl(x2,y1,zoom)
+          url = this._url.getUrl(zoom,x2,y1)
           if(this._tilesCache.has(url)){
             const rasterTile:RasterTile = <RasterTile>this._tilesCache.get(url)
             rasterTiles.push(rasterTile)
           }
-          url = this._url.getUrl(x1,y2,zoom)
+          url = this._url.getUrl(zoom,x1,y2)
           if(this._tilesCache.has(url)){
             const rasterTile:RasterTile = <RasterTile>this._tilesCache.get(url)
             rasterTiles.push(rasterTile)
           }
-          url = this._url.getUrl(x2,y2,zoom)
+          url = this._url.getUrl(zoom,x2,y2)
           if(this._tilesCache.has(url)){
             const rasterTile:RasterTile = <RasterTile>this._tilesCache.get(url)
             rasterTiles.push(rasterTile)

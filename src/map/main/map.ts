@@ -2,7 +2,7 @@ import Camera from './camera';
 import { Event, EventHandlerManager } from '../events/types';
 import { MapOptions } from './types';
 import { Sources,SourceOption } from '../source/types';
-import { Layers,LayerOption } from '../layer/types';
+import { Layers,ILayer,LayerOption } from '../layer/types';
 import { Cancelable } from '../utils/types';
 import { Transform } from '../geo/types';
 import { Render } from '../render/types';
@@ -16,7 +16,7 @@ class Map extends Camera {
   private _sources:Sources;
   private _layers:Layers;
   _render: Render;
-  private _frame: Cancelable;
+  private _animationFrame: Cancelable;
   private _options: MapOptions;
   private _url: URL;
   private _renderTaskQueue: TaskQueue;
@@ -41,6 +41,12 @@ class Map extends Camera {
     } else {
       throw new Error(`Invalid type: 'container' must be a String or HTMLElement.`);
     }
+    if(!options.source || options.source.length === 0){
+      throw new Error('[ERROR]:source is empty');
+    }
+    if(!options.layer || options.layer.length === 0){
+      throw new Error('[ERROR]:layer is empty');
+    }
     const canvasContainer: HTMLElement = Utils.DOM.create('div', undefined, 'touch-action: none;cursor: grab;user-select: none;', container)
     const canvas: HTMLCanvasElement = <HTMLCanvasElement>Utils.DOM.create('canvas', undefined, "position: absolute;left: 0;top: 0;", canvasContainer);
     canvas.width = container.clientWidth;
@@ -51,6 +57,12 @@ class Map extends Camera {
     this._url = new URL('','')
     this._sources = new Sources()
     this._layers = new Layers(this._sources,this)
+    options.source.forEach(item=>{
+      this.addSource(item)
+    })
+    options.layer.forEach(item=>{
+      this.addLayer(item)
+    })
     const render = new Render(this);
     this._options = options;
     this._renderTaskQueue = new TaskQueue();
@@ -92,18 +104,21 @@ class Map extends Camera {
     return this._renderTaskQueue.add(callback);
   }
   _update(updateStyle?: boolean) {
-    this._frame = Utils.Browser.requestAnimationFrame((paintStartTimeStamp: number) => {
-      this._frame = null;
+    this._animationFrame && this._animationFrame.cancel && this._animationFrame.cancel()
+    this._animationFrame = Utils.Browser.requestAnimationFrame((paintStartTimeStamp: number) => {
+      this._animationFrame = null;
       this._renderTaskQueue.run()
       this._render.render();
       return this
     });
   }
   triggerRepaint() {
-    this._frame = Utils.Browser.requestAnimationFrame((paintStartTimeStamp: number) => {
-      this._frame = null;
+    this._animationFrame && this._animationFrame.cancel && this._animationFrame.cancel()
+    this._animationFrame = Utils.Browser.requestAnimationFrame((paintStartTimeStamp: number) => {
+      this._animationFrame = null;
       this._renderTaskQueue.run()
-      this._render.render();
+      // this._render.render();
+      this._layers.render()
       this.triggerRepaint()
       return this
     });

@@ -149,10 +149,10 @@ class Transform {
   clearOutTransform() {
     this._ctx.fillStyle = "#010101";
     const screenBound: Bound = this._screenBound
-    this._ctx.fillRect(0, 0, screenBound.xmin, this.height);
-    this._ctx.fillRect(0, 0, this.width, screenBound.ymin);
-    this._ctx.fillRect(screenBound.xmax, 0, this.width, this.height);
-    this._ctx.fillRect(0, screenBound.ymax, this.width, this.height);
+    // this._ctx.fillRect(0, 0, screenBound.xmin, this.height);
+    // this._ctx.fillRect(0, 0, this.width, screenBound.ymin);
+    // this._ctx.fillRect(screenBound.xmax, 0, this.width, this.height);
+    // this._ctx.fillRect(0, screenBound.ymax, this.width, this.height);
   }
   initTransform() {
     this._ctx.fillStyle = "#010101";

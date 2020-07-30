@@ -55,7 +55,7 @@ export default class RasterTile implements Tile{
     fetch(this._url, request).then(response => {
       if (response.ok) {
         response.arrayBuffer().then(data => {
-          if (Utils.Browser.offscreenCanvasSupported()) {
+          if (!Utils.Browser.offscreenCanvasSupported()) {
             this.arrayBufferToImageBitmap(data);
           } else {
             this.arrayBufferToImage(data);
