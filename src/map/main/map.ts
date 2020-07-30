@@ -103,15 +103,6 @@ class Map extends Camera {
     // this._update();
     return this._renderTaskQueue.add(callback);
   }
-  _update(updateStyle?: boolean) {
-    this._animationFrame && this._animationFrame.cancel && this._animationFrame.cancel()
-    this._animationFrame = Utils.Browser.requestAnimationFrame((paintStartTimeStamp: number) => {
-      this._animationFrame = null;
-      this._renderTaskQueue.run()
-      this._render.render();
-      return this
-    });
-  }
   triggerRepaint() {
     this._animationFrame && this._animationFrame.cancel && this._animationFrame.cancel()
     this._animationFrame = Utils.Browser.requestAnimationFrame((paintStartTimeStamp: number) => {

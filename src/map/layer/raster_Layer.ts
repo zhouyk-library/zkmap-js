@@ -13,7 +13,7 @@ export default class RasterLayer implements ILayer {
     this._transform = transform
     this._id = option.id
     this._sourceId = option.source
-    const canvas = Utils.Canvas2D.createCanvas(transform.height, transform.width);
+    const canvas = Utils.Canvas2D.createCanvas(transform.width, transform.height);
     this._canvas = canvas;
     this._ctx = canvas.getContext('2d')
     this._enable = true;
@@ -52,7 +52,7 @@ export default class RasterLayer implements ILayer {
     return this._canvas
   }
   draw():void{
-    this._transform.context.ctx.drawImage(this.getImage(),0,0,this._transform.height, this._transform.width)
+    this._transform.context.ctx.drawImage(this.getImage(),0,0, this._transform.width,this._transform.height)
   }
   getSourceId():string {
     return this._sourceId;

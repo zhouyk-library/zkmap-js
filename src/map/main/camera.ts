@@ -5,43 +5,10 @@ import { Render } from '../render/types';
 class Camera extends Evented {
   transform: Transform;
   _render: Render;
-  offsetX: number = 0;
-  offsetY: number = 0;
-  dragFlag: boolean;
-  start: any = {};
 
   constructor(transform: Transform) {
     super();
     this.transform = transform;
-    this.on('wheel', this.wheelZoomCenter)
-    this.on('mouseup', this.mouseupDetail)
-    this.on('mousemove', this.mousemoveDetail)
-    this.on('mousedown', this.mousedownDetail)
-  }
-  mouseupDetail(event): void {
-    this.dragFlag = false
-  }
-  mousemoveDetail(event): void {
-    if (this.dragFlag) {
-      // this.transform.moveCenter([event.x - this.start.x,event.y - this.start.y])
-      // this.render.computed()
-      // this.start.x = event.x;
-      // this.start.y = event.y;
-    }
-  }
-  mousedownDetail(event): void {
-    this.dragFlag = true
-    this.start.x = event.x;
-    this.start.y = event.y;
-  }
-  wheelZoomCenter(event): void {
-    const sensitivity = 100;
-    const delta = -event.deltaY / sensitivity /5
-    if ((this.transform.maxZoom < this.transform.zoom && delta > 0)
-      || (this.transform.minZoom > this.transform.zoom && delta < 0)) return;
-    // this.transform.anchorPoint = [event.x,event.y]
-    // this.transform.zoom = this.transform.zoom + delta
-    // this.render.computed()
   }
   getCenter(): LngLat { return this.transform.center; }
   setCenter(center: LngLat) { this.transform.center = center}
