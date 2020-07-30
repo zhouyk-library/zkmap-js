@@ -16,18 +16,18 @@ export default class Render {
     this._painter = new Painter(this._ctx, this._map);
   }
   render() {
-    const screenBound: Bound = this._transform.screenBound
-    const ctx = this._ctx
-    ctx.save();
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.lineWidth = 1
-    ctx.fillStyle = "#f0f0f0";
-    ctx.beginPath();
-    ctx.fillRect(screenBound.xmin, screenBound.ymin, screenBound.xmax - screenBound.xmin, screenBound.ymax - screenBound.ymin);
-    ctx.closePath()
-    ctx.stroke();
-    ctx.restore();
-    this._painter.render();
+    // const screenBound: Bound = this._transform.screenBound
+    // const ctx = this._ctx
+    // ctx.save();
+    // ctx.setTransform(1, 0, 0, 1, 0, 0);
+    // ctx.lineWidth = 1
+    // ctx.fillStyle = "#f0f0f0";
+    // ctx.beginPath();
+    // ctx.fillRect(screenBound.xmin, screenBound.ymin, screenBound.xmax - screenBound.xmin, screenBound.ymax - screenBound.ymin);
+    // ctx.closePath()
+    // ctx.stroke();
+    // ctx.restore();
+    // this._painter.render();
   }
   computed() {
     // this._painter.computed();

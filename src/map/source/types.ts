@@ -2,6 +2,7 @@ import RasterSource from './raster_source';
 import Sources from './sources';
 import TilesCache from './tile_cache';
 import RasterTile from './raster/raster_tile';
+import { Transform, Bound } from '../geo/types';
 export {RasterSource,TilesCache,RasterTile,Sources}
 export enum TileState{NONE=0,LOADING=2,OK=1,ERROR=-1}
 export type SourceResult = {
@@ -20,7 +21,11 @@ export interface Tile {
   z: number;
   x: number;
   y: number;
-  image: HTMLImageElement | ImageBitmap | HTMLCanvasElement;
+  image: CanvasImageSource;
+  dx: number;
+  dy: number;
+  dw: number;
+  dh: number
   time:number;
   xyz:string;
   id:string;
@@ -29,12 +34,13 @@ export interface Tile {
 export interface ISource {
   id: String;
   refresh(): void;
-  getData(z: number, xStart: number, xEnd: number, yStart: number, yEnd: number): SourceResult;
+  getData(transform: Transform, bound: Bound): SourceResult;
 }
 
 export type SourceOption = {
   id:string;
   type:string;
   url?:string;
+  tileSize?:number;
   scheme?: string
 }

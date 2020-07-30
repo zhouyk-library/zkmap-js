@@ -21,36 +21,22 @@ export default class RasterLayer implements ILayer {
   render(source:ISource): void{
     Utils.Canvas2D.clearRect(this._ctx, 0, 0, this._transform.width, this._transform.height);
     const screenBound: Bound = this._transform.screenBound
-    const allCount = Math.pow(2, this._transform.zoomInt)
-    const outXEnd = this._transform.width, outXStart = 0, outYEnd = this._transform.height, outYStart = 0
-    const inXStart = screenBound.xmin, inYStart = screenBound.ymin, inXEnd = screenBound.xmax, inYEnd = screenBound.ymax
-    const countX = inXEnd - inXStart
-    const countY = inYEnd - inYStart
-    const xstart = Math.floor(allCount / countX * (Math.max(inXStart, outXStart) - inXStart))
-    const xend = Math.ceil(allCount / countX * (Math.min(inXEnd, outXEnd) - inXStart))
-    const ystart = Math.floor(allCount / countY * (Math.max(inYStart, outYStart) - inYStart))
-    const yend = Math.ceil(allCount / countY * (Math.min(inYEnd, outYEnd) - inYStart))
-    const sourceResult:SourceResult = source.getData(this._transform.zoomInt,xstart, xend, ystart, yend)
+    const sourceResult:SourceResult = source.getData(this._transform,screenBound)
     this.drawImages(sourceResult.tile_parent).drawImages(sourceResult.tile_child).drawImages(sourceResult.tile_cur)
   }
   drawImages(tiles: Tile[] = []){
-    const screenBound: Bound = this._transform.screenBound
-    const inXStart = screenBound.xmin, inYStart = screenBound.ymin
     tiles.forEach((tile: Tile) => {
-      const width =  256 * Math.pow(2, this._transform.zoom - tile.z)
-      const screenX = tile.x * width + inXStart;
-      const screenY = tile.y * width + inYStart;
-      this.drawImageOpacity(screenX,screenY,width,width,tile)
+      this.drawImageOpacity(tile)
     });
     return this
   }
-  drawImageOpacity(screenX:number,screenY:number,height:number,width:number,tile: Tile) {
+  drawImageOpacity(tile: Tile) {
     const opacity = tile.isLoaded ? this.getTileOpacity(tile) : 0
     const alpha = this._ctx.globalAlpha;
     if (opacity < 1) {
       this._ctx.globalAlpha = opacity;
     }
-    this._ctx.drawImage(tile.image, screenX, screenY, width, height);
+    this._ctx.drawImage(tile.image, tile.dx, tile.dy, tile.dw, tile.dh);
     if (this._ctx.globalAlpha !== alpha) {
       this._ctx.globalAlpha = alpha;
     }

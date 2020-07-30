@@ -1,4 +1,4 @@
-import {ILayer,LayerOption,RasterLayer} from './types'
+import {ILayer,LayerOption,RasterLayer,RasterDebuggerLayer} from './types'
 import { Transform } from '../geo/types';
 import {Sources,ISource} from '../source/types'
 import { Map as Zkmap } from '../main/types';
@@ -19,8 +19,11 @@ export default class Layers{
     var layer:ILayer = null;
     switch (option.type) {
       case "raster":
-        layer = new RasterLayer(option,this._transform);
+          layer = new RasterLayer(option,this._transform);
         break;
+        case "rasterdebugger":
+          layer = new RasterDebuggerLayer(option,this._transform);
+          break;
       default:
         break;
     }
@@ -52,7 +55,7 @@ export default class Layers{
   render(): void{
     this.forEach((layer: ILayer, key: String)=>{
       const sourceId:string = layer.getSourceId()
-      if(!this._sources.hasSource(sourceId)){
+      if(!(this._sources.hasSource(sourceId) || 'debugger' == sourceId)){
         return ;
       }
       const source:ISource = this._sources.getSource(sourceId)

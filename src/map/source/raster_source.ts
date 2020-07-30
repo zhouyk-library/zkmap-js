@@ -1,5 +1,6 @@
 import { ISource,TilesCache, RasterTile,Tile,SourceResult,SourceOption } from './types'
 import { URL } from '../com/types';
+import { Transform, Bound } from '../geo/types';
 export default class RasterSource implements ISource {
   private _id: String;
   private _tilesCache :TilesCache;
@@ -8,9 +9,11 @@ export default class RasterSource implements ISource {
   private _lstChildTile: Array<RasterTile>;
   private _lstCurTile: Array<RasterTile>;
   private _url: URL;
+  private _tileSize: number = 256;
   constructor(option:SourceOption) {
     this._id = option.id
     this._url = new URL(option.url,option.scheme)
+    this._tileSize = option.tileSize || this._tileSize
     this._tilesCache = new TilesCache(1000)
     this._mapLoadingTile = new Map<String,RasterTile>()
     this._lstParentTile = new Array<RasterTile>()
@@ -21,24 +24,47 @@ export default class RasterSource implements ISource {
     return this._id;
   }
   refresh(): void{}
-  getData(z: number, xStart: number, xEnd: number, yStart: number, yEnd: number): SourceResult{
-    for (let x = xStart; x < xEnd; x++) {
-      for (let y = yStart; y < yEnd; y++) {
+  getData(transform: Transform, bound: Bound): SourceResult{
+    const z = transform.zoomInt
+    const allCount = Math.pow(2, z)
+    const outXEnd = transform.width, outXStart = 0, outYEnd = transform.height, outYStart = 0
+    const inXStart = bound.xmin, inYStart = bound.ymin, inXEnd = bound.xmax, inYEnd = bound.ymax
+    const countX = inXEnd - inXStart
+    const countY = inYEnd - inYStart
+    const xstart = Math.floor(allCount / countX * (Math.max(inXStart, outXStart) - inXStart))
+    const xend = Math.ceil(allCount / countX * (Math.min(inXEnd, outXEnd) - inXStart))
+    const ystart = Math.floor(allCount / countY * (Math.max(inYStart, outYStart) - inYStart))
+    const yend = Math.ceil(allCount / countY * (Math.min(inYEnd, outYEnd) - inYStart))
+    const lstParentTile = new Array<string>()
+    for (let x = xstart; x < xend; x++) {
+      for (let y = ystart; y < yend; y++) {
         const url = this._url.getUrl(z,x,y)
         if(this._mapLoadingTile.has(url)){
           continue;
         }
-
+        const size = this._tileSize * Math.pow(2, transform.zoom - z)
+        const screenX = x * size + inXStart;
+        const screenY = y * size + inYStart;
         if(this._tilesCache.has(url)){
-          this._lstCurTile.push(<RasterTile>this._tilesCache.get(url))
+          this._lstCurTile.push(this.setTilesTransfrom(<RasterTile>this._tilesCache.get(url),screenX,screenY,size))
         }else{
           const raster: RasterTile = new RasterTile(z, x, y, url).load().then((tile:Tile) => {
             this._tilesCache.add(tile)
             this._mapLoadingTile.delete(tile.id)
           })
+          this.setTilesTransfrom(raster,screenX,screenY,size)
           this._mapLoadingTile.set(raster.id,raster)
-          this._lstParentTile = this._findParentTile(raster)
-          this._lstChildTile = this._findChildTiles(raster)
+          this._findParentTile(raster).forEach(item=>{
+            if(!lstParentTile.includes(item.id)){
+              lstParentTile.push(item.id)
+              this.setRasterTileTransfrom(item,transform,inXStart,inYStart)
+              this._lstParentTile.push(item)
+            }
+          })
+          this._findChildTiles(raster).forEach(item=>{
+            this.setRasterTileTransfrom(item,transform,inXStart,inYStart)
+            this._lstChildTile.push(item)
+          })
         }
       }
     }
@@ -47,6 +73,19 @@ export default class RasterSource implements ISource {
       tile_parent: this._lstParentTile,
       tile_child: this._lstChildTile
     }
+  }
+  private setRasterTileTransfrom(raster: RasterTile,transform: Transform, inXStart: number, inYStart: number):RasterTile{
+    const size = this._tileSize * Math.pow(2, transform.zoom - raster.z)
+    const dx = raster.x * size + inXStart;
+    const dy = raster.y * size + inYStart;
+    this.setTilesTransfrom(raster,dx,dy,size)
+    return raster;
+
+  }
+  private setTilesTransfrom(raster: RasterTile, dx: number, dy: number, size: number):RasterTile{
+    raster.transfroms(dx,dy,size,size)
+    return raster;
+
   }
   private _findParentTile(raster: RasterTile):RasterTile[] {
     const rasterTiles: RasterTile[] = []
@@ -57,7 +96,7 @@ export default class RasterSource implements ISource {
         if(zoom>=0){
           const y1 = Math.floor(y / Math.pow(2,index))
           const x1 = Math.floor(x / Math.pow(2,index))
-          const url:string = this._url.getUrl(z,x,y)
+          const url:string = this._url.getUrl(z,x1,y1)
           if(this._tilesCache.has(url)){
             const rasterTile:RasterTile = <RasterTile>this._tilesCache.get(url)
             rasterTiles.push(rasterTile)

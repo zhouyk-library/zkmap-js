@@ -8,14 +8,25 @@ export default class RasterTile implements Tile{
   private _y: number;
   private _url: string;
   private _controller: AbortController;
-  private _image: HTMLImageElement | ImageBitmap;
+  private _image: CanvasImageSource;
   private _state: number = TileState.NONE;
   private _done: (_: RasterTile) => void;
+  private _dx: number = 0;
+  private _dy: number = 0;
+  private _dw: number = 256;
+  private _dh: number = 256;
+  
   constructor(z: number, x: number, y: number, url: string) {
     this._z = z
     this._x = x
     this._y = y
     this._url = url
+  }
+  transfroms(dx: number, dy: number, dw: number, dh: number){
+    this._dx = dx
+    this._dy = dy
+    this._dw = dw
+    this._dh = dh
   }
   arrayBufferToImageBitmap(data: ArrayBuffer) {
     const blob: Blob = new window.Blob([new Uint8Array(data)], { type: 'image/png' });
@@ -90,8 +101,12 @@ export default class RasterTile implements Tile{
   get z(): number { return this._z }
   get x(): number { return this._x }
   get y(): number { return this._y }
-  get image(): HTMLImageElement | ImageBitmap { return this._image }
+  get image(): CanvasImageSource { return this._image }
   get time():number { return this._time }
   get xyz():string { return this._z+'-'+this._x+'-'+this._y}
   get id():string { return this._url}
+  get dx(): number{ return this._dx};
+  get dy(): number{ return this._dy};
+  get dw(): number{ return this._dw};
+  get dh(): number{ return this._dh}
 }

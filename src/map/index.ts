@@ -17,6 +17,11 @@ export default {
         id:'layerId',
         type:'raster',
         source:'sourceId',
+      },
+      {
+        id:'rasterdebuggerId',
+        type:'rasterdebugger',
+        source:'debugger'
       }
     ]
   })

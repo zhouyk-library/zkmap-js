@@ -1,8 +1,9 @@
 
 import RasterLayer from './raster_Layer';
+import RasterDebuggerLayer from './raster_debugger_layer';
 import Layers from './layers';
 import {ISource} from '../source/types'
-export {RasterLayer,Layers}
+export {RasterLayer,Layers,RasterDebuggerLayer}
 export interface ILayer {
   id: string;
   enable(): void;
