@@ -60,6 +60,10 @@ export default class Layers{
       }
       const source:ISource = this._sources.getSource(sourceId)
       layer.render(source)
+    })
+  }
+  draw(): void{
+    this.forEach((layer: ILayer, key: String)=>{
       layer.draw()
     })
   }

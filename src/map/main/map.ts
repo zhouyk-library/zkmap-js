@@ -108,6 +108,7 @@ class Map extends Camera {
       this._animationFrame = null;
       this._renderTaskQueue.run()
       this._layers.render()
+      this._layers.draw()
       this.triggerRepaint()
       return this
     });
