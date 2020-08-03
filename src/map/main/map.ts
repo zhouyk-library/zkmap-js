@@ -1,20 +1,20 @@
 import Camera from './camera';
 import { Event, EventHandlerManager } from '../events/types';
 import { MapOptions } from './types';
-import { Sources,SourceOption } from '../source/types';
-import { Layers,ILayer,LayerOption } from '../layer/types';
+import { Sources, SourceOption } from '../source/types';
+import { Layers, ILayer, LayerOption } from '../layer/types';
 import { Cancelable } from '../utils/types';
 import { Transform } from '../geo/types';
 import { Render } from '../render/types';
-import { TaskQueue,TaskID } from '../queue/types';
+import { TaskQueue, TaskID } from '../queue/types';
 import { URL } from '../com/types';
 import Utils from '../utils'
 
 class Map extends Camera {
   private _container: HTMLElement;
   private _canvas: HTMLCanvasElement;
-  private _sources:Sources;
-  private _layers:Layers;
+  private _sources: Sources;
+  private _layers: Layers;
   _render: Render;
   private _animationFrame: Cancelable;
   private _options: MapOptions;
@@ -41,10 +41,10 @@ class Map extends Camera {
     } else {
       throw new Error(`Invalid type: 'container' must be a String or HTMLElement.`);
     }
-    if(!options.source || options.source.length === 0){
+    if (!options.source || options.source.length === 0) {
       throw new Error('[ERROR]:source is empty');
     }
-    if(!options.layer || options.layer.length === 0){
+    if (!options.layer || options.layer.length === 0) {
       throw new Error('[ERROR]:layer is empty');
     }
     const canvasContainer: HTMLElement = Utils.DOM.create('div', undefined, 'touch-action: none;cursor: grab;user-select: none;', container)
@@ -54,13 +54,13 @@ class Map extends Camera {
     container.appendChild(canvasContainer);
     const transform = new Transform(canvas, options.minZoom, options.maxZoom, options.type);
     super(transform);
-    this._url = new URL('','')
+    this._url = new URL('', '')
     this._sources = new Sources()
-    this._layers = new Layers(this._sources,this)
-    options.source.forEach(item=>{
+    this._layers = new Layers(this._sources, this)
+    options.source.forEach(item => {
       this.addSource(item)
     })
-    options.layer.forEach(item=>{
+    options.layer.forEach(item => {
       this.addLayer(item)
     })
     const render = new Render(this);
@@ -76,8 +76,8 @@ class Map extends Camera {
     this.on('refresh', this.triggerRepaint)
     this._render.computed();
   }
-  getUrl(z: number, x: number, y: number): string{
-    return this._url.getUrl(z,x,y)
+  getUrl(z: number, x: number, y: number): string {
+    return this._url.getUrl(z, x, y)
   }
   getCanvasContainer(): HTMLElement {
     return this._canvasContainer
@@ -85,21 +85,21 @@ class Map extends Camera {
   resize(eventData?: Object) {
     this.transform.resize(this._container.clientWidth, this._container.clientHeight)
   }
-  addSource(sourceOption:SourceOption):String {
+  addSource(sourceOption: SourceOption): String {
     this._sources.addCreatSource(sourceOption)
     return sourceOption.id
   }
-  removeSource(sourceId:string){
+  removeSource(sourceId: string) {
     this._sources.remove(sourceId)
   }
-  addLayer(layerOption:LayerOption,layerId?:string):String {
-    this._layers.addCreatLayer(layerOption,layerId)
+  addLayer(layerOption: LayerOption, layerId?: string): String {
+    this._layers.addCreatLayer(layerOption, layerId)
     return layerOption.id
   }
-  removeLayer(layerId:string){
+  removeLayer(layerId: string) {
     this._layers.remove(layerId)
   }
-  _requestRenderFrame(callback: (_:any) => void): TaskID {
+  _requestRenderFrame(callback: (_: any) => void): TaskID {
     return this._renderTaskQueue.add(callback);
   }
   triggerRepaint() {

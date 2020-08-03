@@ -155,6 +155,9 @@ class Transform {
     // this._ctx.fillRect(screenBound.xmax, 0, this.width, this.height);
     // this._ctx.fillRect(0, screenBound.ymax, this.width, this.height);
   }
+  clearRect() {
+    Utils.Canvas2D.clearRect(this._ctx, 0, 0, this.width, this.height);
+  }
   initTransform() {
     this._ctx.fillStyle = "#010101";
     this._ctx.fillRect(0, 0, this.width, this.height);
