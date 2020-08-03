@@ -65,17 +65,13 @@ export default class EventHandlerManager {
       if (handler[type]) {
         data = handler[type](e, points);
         if (data) {
-          console.log(data.around,data.targetZoom,data.dragDelta)
           if (!!data.around) this._map.transform.anchorPoint = data.around.toArray()
           if (!!data.targetZoom) this._map.transform.zoom = data.targetZoom
           if (!!data.dragDelta) this._map.transform.moveCenter(data.dragDelta.toArray())
-          this._map._render.computed()
+          // this._map._render.computed()
           if (data.renderFrame) {
             this.triggerRenderFrame()
           }
-          // if (handlerName === 'mousePan') {
-          //   this._map._update()
-          // }
         }
       }
     }

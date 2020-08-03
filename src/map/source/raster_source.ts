@@ -36,10 +36,12 @@ export default class RasterSource implements ISource {
     const ystart = Math.floor(allCount / countY * (Math.max(inYStart, outYStart) - inYStart))
     const yend = Math.ceil(allCount / countY * (Math.min(inYEnd, outYEnd) - inYStart))
     const lstParentTile = new Array<string>()
+    const lstLoadingTile:Array<String> =  new Array<String>()
     for (let x = xstart; x < xend; x++) {
       for (let y = ystart; y < yend; y++) {
         const url = this._url.getUrl(z,x,y)
         if(this._mapLoadingTile.has(url)){
+          lstLoadingTile.push(url)
           continue;
         }
         const size = this._tileSize * Math.pow(2, transform.zoom - z)
@@ -54,6 +56,7 @@ export default class RasterSource implements ISource {
           })
           this.setTilesTransfrom(raster,screenX,screenY,size)
           this._mapLoadingTile.set(raster.id,raster)
+          lstLoadingTile.push(raster.id)
           this._findParentTile(raster).forEach(item=>{
             if(!lstParentTile.includes(item.id)){
               lstParentTile.push(item.id)
@@ -68,6 +71,13 @@ export default class RasterSource implements ISource {
         }
       }
     }
+    
+    Array.from(this._mapLoadingTile.keys()).forEach(tileId=>{
+      if(!lstLoadingTile.includes(tileId)){
+        this._mapLoadingTile.get(tileId).destroy()
+        this._mapLoadingTile.delete(tileId)
+      }
+    })
     return {
       tile_cur: this._lstCurTile,
       tile_parent: this._lstParentTile,

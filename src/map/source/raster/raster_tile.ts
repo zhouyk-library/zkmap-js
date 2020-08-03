@@ -89,6 +89,11 @@ export default class RasterTile implements Tile{
     delete this._z
     delete this._x
     delete this._y
+    delete this._done
+    delete this._dx
+    delete this._dy
+    delete this._dw
+    delete this._dh
     delete this._url
     delete this._controller
     delete this._image

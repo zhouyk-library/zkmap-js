@@ -100,7 +100,6 @@ class Map extends Camera {
     this._layers.remove(layerId)
   }
   _requestRenderFrame(callback: (_:any) => void): TaskID {
-    // this._update();
     return this._renderTaskQueue.add(callback);
   }
   triggerRepaint() {
@@ -108,7 +107,6 @@ class Map extends Camera {
     this._animationFrame = Utils.Browser.requestAnimationFrame((paintStartTimeStamp: number) => {
       this._animationFrame = null;
       this._renderTaskQueue.run()
-      // this._render.render();
       this._layers.render()
       this.triggerRepaint()
       return this

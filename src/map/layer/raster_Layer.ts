@@ -47,7 +47,6 @@ export default class RasterLayer implements ILayer {
     }
     return Math.min(1, (Utils.Browser.now() - tile.time) / (1000 / 60 * 10));
   }
-
   getImage(): HTMLCanvasElement{
     return this._canvas
   }
