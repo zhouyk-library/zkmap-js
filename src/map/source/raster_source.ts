@@ -56,6 +56,10 @@ export default class RasterSource implements ISource {
           const raster: RasterTile = new RasterTile(z, x, y, url).load().then((tile: Tile) => {
             this._tilesCache.add(tile)
             this._mapLoadingTile.delete(tile.id)
+          }).error((tile: Tile) => {
+            console.log(tile.id);
+
+            this._mapLoadingTile.delete(tile.id)
           })
           this.setTilesTransfrom(raster, screenX, screenY, size)
           this._mapLoadingTile.set(raster.id, raster)
