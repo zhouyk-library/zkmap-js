@@ -1,40 +1,46 @@
-import { TileState } from './types'
+import { TileState, Tile } from '../types'
 const transparentPngUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQYV2NgAAIAAAUAAarVyFEAAAAASUVORK5CYII=';
-import Utils from '../utils'
-export default class Tile {
+import Utils from '../../utils'
+export default class RasterTile implements Tile {
   private _time: number;
   private _z: number;
   private _x: number;
   private _y: number;
   private _url: string;
   private _controller: AbortController;
-  private _image: HTMLImageElement | ImageBitmap;
-  private _canvas: HTMLCanvasElement;
+  private _image: CanvasImageSource;
   private _state: number = TileState.NONE;
-  private _done: (_: Tile) => void;
+  private _done: (_: RasterTile) => void;
+  private _error: (_: RasterTile) => void;
+  private _dx: number = 0;
+  private _dy: number = 0;
+  private _dw: number = 256;
+  private _dh: number = 256;
+
   constructor(z: number, x: number, y: number, url: string) {
     this._z = z
     this._x = x
     this._y = y
     this._url = url
-    this._controller = new window.AbortController()
+  }
+  transfroms(dx: number, dy: number, dw: number, dh: number) {
+    this._dx = dx
+    this._dy = dy
+    this._dw = dw
+    this._dh = dh
   }
   arrayBufferToImageBitmap(data: ArrayBuffer) {
     const blob: Blob = new window.Blob([new Uint8Array(data)], { type: 'image/png' });
     window.createImageBitmap(blob).then((imgBitmap) => {
       this._time = Utils.Browser.now()
       this._image = imgBitmap
-      this.covertCanvas()
       this._done && this._done(this)
       this._state = TileState.OK
-    }).catch(error =>
+    }).catch(error => {
       this._state = TileState.ERROR
+      this._error && this._error(this)
+    }
     );
-  }
-  covertCanvas():void{
-    const canvas = Utils.Canvas2D.createCanvas(256, 256);
-    Utils.Canvas2D.image(canvas.getContext('2d'), this._image, 0, 0, 256, 256);
-    this._canvas = canvas;
   }
   arrayBufferToImage(data: ArrayBuffer) {
     const URL = window.URL;
@@ -42,10 +48,10 @@ export default class Tile {
     this._image = image
     this._image.onerror = () => {
       this._state = TileState.ERROR
+      this._error && this._error(this)
     };
     this._image.onload = () => {
       this._time = Utils.Browser.now()
-      this.covertCanvas()
       this._done && this._done(this)
       this._state = TileState.OK
       URL.revokeObjectURL(image.src);
@@ -54,7 +60,8 @@ export default class Tile {
     this._image.src = data.byteLength ? URL.createObjectURL(blob) : transparentPngUrl;
 
   }
-  load() {
+  load(): RasterTile {
+    this._controller = new window.AbortController()
     const request = new window.Request(this._url, {
       method: 'GET',
       mode: 'cors',
@@ -63,7 +70,7 @@ export default class Tile {
     fetch(this._url, request).then(response => {
       if (response.ok) {
         response.arrayBuffer().then(data => {
-          if (Utils.Browser.offscreenCanvasSupported()) {
+          if (!Utils.Browser.offscreenCanvasSupported()) {
             this.arrayBufferToImageBitmap(data);
           } else {
             this.arrayBufferToImage(data);
@@ -72,60 +79,49 @@ export default class Tile {
       }
     }).catch(error => {
       this._state = TileState.ERROR
-      console.log(error)
+      this._error && this._error(this)
     });
     return this
   }
-  then(done: (_: Tile) => void) {
+  then(done: (_: RasterTile) => void): RasterTile {
     this._done = done
     this.isLoaded && this._done(this)
+    return this
   }
-  destroy() {
+  error(error: (_: RasterTile) => void): RasterTile {
+    this._error = error
+    this._state === TileState.ERROR && this._error(this)
+    return this
+  }
+  destroy(): RasterTile {
     this._controller.abort();
     delete this._z
     delete this._x
     delete this._y
+    delete this._done
+    delete this._error
+    delete this._dx
+    delete this._dy
+    delete this._dw
+    delete this._dh
     delete this._url
     delete this._controller
     delete this._image
     delete this._state
     return this
   }
-  getParentKeys(): Array<String> {
-    const keys: Array<String> = new Array()
-    let x = this._x, y = this._y, z = this._z
-    if (z === 0) return keys
-    for (let index = z - 1; index >= 0; index--) {
-      y = Math.floor(y / 2)
-      x = Math.floor(x / 2)
-      keys.push(`${index}-${x}-${y}`)
-    }
-    return keys;
-  }
-  getChildrenKeys(): Array<String> {
-    const keys: Array<String> = new Array()
-    let x = this._x, y = this._y, z = this._z + 1
-    if (z === 0) return keys
-    for (let index = 0; index <= 1; index++) {
-      y = y + index
-      x = x + index
-      keys.push(`${index}-${x}-${y}`)
-    }
-    return keys;
-  }
-  include(z: number, x: number, y: number): Boolean {
-    if (z <= this._z) return false
-    const char = z - this._z
-    const jie = Math.pow(2, char)
-    return this._x * jie < x && x < (this._x + 1) * jie - 1 && this._y * jie < y && y < (this._y + 1) * jie - 1
-  }
   get isLoaded(): Boolean { return this._state === TileState.OK }
   get isFinish(): Boolean { return this._state === TileState.OK || this._state === TileState.ERROR }
   get state(): TileState { return this._state }
-  get zoom(): number { return this._z }
+  get z(): number { return this._z }
   get x(): number { return this._x }
   get y(): number { return this._y }
-  get image(): HTMLImageElement | ImageBitmap | HTMLCanvasElement { return this._canvas ||this._image }
-  get time():number { return this._time }
-  get key():string { return this._z+'-'+this._x+'-'+this._y}
+  get image(): CanvasImageSource { return this._image }
+  get time(): number { return this._time }
+  get xyz(): string { return this._z + '-' + this._x + '-' + this._y }
+  get id(): string { return this._url }
+  get dx(): number { return this._dx };
+  get dy(): number { return this._dy };
+  get dw(): number { return this._dw };
+  get dh(): number { return this._dh }
 }

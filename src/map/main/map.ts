@@ -1,18 +1,24 @@
 import Camera from './camera';
 import { Event, EventHandlerManager } from '../events/types';
 import { MapOptions } from './types';
+import { Sources, SourceOption } from '../source/types';
+import { Layers, ILayer, LayerOption } from '../layer/types';
 import { Cancelable } from '../utils/types';
 import { Transform } from '../geo/types';
 import { Render } from '../render/types';
-import { TaskQueue,TaskID } from '../queue/types';
+import { TaskQueue, TaskID } from '../queue/types';
+import { URL } from '../com/types';
 import Utils from '../utils'
 
 class Map extends Camera {
   private _container: HTMLElement;
   private _canvas: HTMLCanvasElement;
-  private _render: Render;
-  private _frame: Cancelable;
+  private _sources: Sources;
+  private _layers: Layers;
+  _render: Render;
+  private _animationFrame: Cancelable;
   private _options: MapOptions;
+  private _url: URL;
   private _renderTaskQueue: TaskQueue;
   private _canvasContainer: HTMLElement;
   private _eventHandlerManager: EventHandlerManager;
@@ -35,25 +41,43 @@ class Map extends Camera {
     } else {
       throw new Error(`Invalid type: 'container' must be a String or HTMLElement.`);
     }
+    if (!options.source || options.source.length === 0) {
+      throw new Error('[ERROR]:source is empty');
+    }
+    if (!options.layer || options.layer.length === 0) {
+      throw new Error('[ERROR]:layer is empty');
+    }
     const canvasContainer: HTMLElement = Utils.DOM.create('div', undefined, 'touch-action: none;cursor: grab;user-select: none;', container)
     const canvas: HTMLCanvasElement = <HTMLCanvasElement>Utils.DOM.create('canvas', undefined, "position: absolute;left: 0;top: 0;", canvasContainer);
     canvas.width = container.clientWidth;
     canvas.height = container.clientHeight;
     container.appendChild(canvasContainer);
     const transform = new Transform(canvas, options.minZoom, options.maxZoom, options.type);
-    const render = new Render(transform);
-    super(transform, render);
+    super(transform);
+    this._url = new URL('', '')
+    this._sources = new Sources()
+    this._layers = new Layers(this._sources, this)
+    options.source.forEach(item => {
+      this.addSource(item)
+    })
+    options.layer.forEach(item => {
+      this.addLayer(item)
+    })
+    const render = new Render(this);
     this._options = options;
     this._renderTaskQueue = new TaskQueue();
     this._canvas = canvas;
     this._container = container
     this._canvasContainer = canvasContainer
     this._eventHandlerManager = new EventHandlerManager(this)
-    this._bind()
     this.resize();
     this._render = render;
     this.triggerRepaint()
     this.on('refresh', this.triggerRepaint)
+    this._render.computed();
+  }
+  getUrl(z: number, x: number, y: number): string {
+    return this._url.getUrl(z, x, y)
   }
   getCanvasContainer(): HTMLElement {
     return this._canvasContainer
@@ -61,57 +85,30 @@ class Map extends Camera {
   resize(eventData?: Object) {
     this.transform.resize(this._container.clientWidth, this._container.clientHeight)
   }
-  
-  _requestRenderFrame(callback: (_:any) => void): TaskID {
-    this._update();
+  addSource(sourceOption: SourceOption): String {
+    this._sources.addCreatSource(sourceOption)
+    return sourceOption.id
+  }
+  removeSource(sourceId: string) {
+    this._sources.remove(sourceId)
+  }
+  addLayer(layerOption: LayerOption, layerId?: string): String {
+    this._layers.addCreatLayer(layerOption, layerId)
+    return layerOption.id
+  }
+  removeLayer(layerId: string) {
+    this._layers.remove(layerId)
+  }
+  _requestRenderFrame(callback: (_: any) => void): TaskID {
     return this._renderTaskQueue.add(callback);
   }
-  _update(updateStyle?: boolean) {
-  }
-  _bind() {
-    this._canvas.addEventListener("click", this._onClick.bind(this));
-    this._canvas.addEventListener("dblclick", this._onDoubleClick.bind(this));
-    this._canvas.addEventListener("mousedown", this._onMouseDown.bind(this));
-    this._canvas.addEventListener("mousemove", this._onMouseMove.bind(this));
-    this._canvas.addEventListener("mouseup", this._onMouseUp.bind(this));
-    this._canvas.addEventListener("wheel", this._onWheel.bind(this));
-  }
-  _onClick(event) {
-    this.fire(new Event("click", event))
-  }
-
-  _onDoubleClick(event) {
-    this.fire(new Event("dblclick", event))
-  }
-
-  _onMouseDown(event) {
-    this.fire(new Event("mousedown", event))
-  }
-
-  _onMouseMove(event) {
-    this.fire(new Event("mousemove", event))
-  }
-
-  _onMouseUp(event) {
-    this.fire(new Event("mouseup", event))
-  }
-
-  _onWheel(event) {
-    this.fire(new Event("wheel", event))
-  }
-
-  destroy() {
-    this._canvas.removeEventListener("click", this._onClick);
-    this._canvas.removeEventListener("dblclick", this._onDoubleClick);
-    this._canvas.removeEventListener("mousedown", this._onMouseDown);
-    this._canvas.removeEventListener("mousemove", this._onMouseMove);
-    this._canvas.removeEventListener("mouseup", this._onMouseUp);
-    this._canvas.removeEventListener("wheel", this._onWheel);
-  }
   triggerRepaint() {
-    this._frame = Utils.Browser.requestAnimationFrame((paintStartTimeStamp: number) => {
-      this._frame = null;
-      this._render.render();
+    this._animationFrame && this._animationFrame.cancel && this._animationFrame.cancel()
+    this._animationFrame = Utils.Browser.requestAnimationFrame((paintStartTimeStamp: number) => {
+      this._animationFrame = null;
+      this._renderTaskQueue.run()
+      this._layers.render()
+      this._layers.draw()
       this.triggerRepaint()
       return this
     });

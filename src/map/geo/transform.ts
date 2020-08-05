@@ -36,8 +36,8 @@ class Transform {
     this._maxZoom = maxZoom || constant.maxZoom;
     this.width = canvas && canvas.width;
     this.height = canvas && canvas.height;
-    this._center = new LngLat(119.47889, 35.361946);
-    this._zoom = 15;
+    this._center = new LngLat(108.95000, 34.26667);
+    this._zoom = 14;
     this._projection = new WebMercator();
     this._bound = this._projection.bound;
 
@@ -46,12 +46,12 @@ class Transform {
       this._context = new Context(this._ctx);
     }
     // 设置默认矩阵zoom为0
-    Utils.Matrix2D.setFromArray(this._default,[256/(this._bound.xmax - this._bound.xmin) * this._bound.xscale, 0, 0, 256 / (this._bound.ymax - this._bound.ymin) * this._bound.yscale, this.width / 2, this.height / 2])
+    Utils.Matrix2D.setFromArray(this._default, [256 / (this._bound.xmax - this._bound.xmin) * this._bound.xscale, 0, 0, 256 / (this._bound.ymax - this._bound.ymin) * this._bound.yscale, this.width / 2, this.height / 2])
     // 设置当前矩阵居中
     this._matrix = [256 * Math.pow(2, this._zoom) / (this._bound.xmax - this._bound.xmin) * this._bound.xscale, 0, 0, 256 * Math.pow(2, this._zoom) / (this._bound.ymax - this._bound.ymin) * this._bound.yscale, this.width / 2, this.height / 2]
     this.setCenter(this._center)
     this._ctx.setTransform(1, 0, 0, 1, 0, 0);
-    this.updateVisualBound()
+    this.initTransform()
   }
   get context(): Context {
     return this._context
@@ -91,17 +91,17 @@ class Transform {
     this._center = center;
     this.setCenter(center)
   }
-  setCenter(lngLat: LngLat){
+  setCenter(lngLat: LngLat) {
     const screen = this.lngLat2screen(lngLat.toArray())
     this.moveCenter([this.width / 2 - screen[0], this.height / 2 - screen[1]])
   }
-  moveCenter([dx, dy]: number[]){
+  moveCenter([dx, dy]: number[]) {
     const dxe = dx / this._matrix[0]
     const dyf = dy / this._matrix[3]
-    Utils.Matrix2D.translate(this._matrix,dxe,dyf)
-    this.clearTransform()
+    Utils.Matrix2D.translate(this._matrix, dxe, dyf)
+    this.initTransform()
   }
-  set anchorPoint(pixel: number[]){
+  set anchorPoint(pixel: number[]) {
     this._anchorPoint = pixel
   }
   get zoom(): number { return this._zoom; }
@@ -114,7 +114,7 @@ class Transform {
     this._tileZoom = Math.floor(z);
     this.updateZoomMatrix()
   }
-  updateZoomMatrix(){
+  updateZoomMatrix() {
     /**
      * matrix1 * matrix = matrix2;
      * matrix1当前矩阵,matrix2为变换后的结果矩阵,matrix为变换矩阵
@@ -134,7 +134,7 @@ class Transform {
      * 5.联立3和4  求得 e = (x2 - scale * (x1 - e1) - e1) / a1
      * 
      */
-    const matrix:Array<number> = this.default
+    const matrix: Array<number> = this.default
     const anchorPoint = this._anchorPoint && this._anchorPoint.slice() || this.lngLat2screen(this._center.toArray())
     this._anchorPoint = null
     const x = anchorPoint[0], y = anchorPoint[1]
@@ -143,44 +143,54 @@ class Transform {
     const e = (x2 - a * (x1 - e1) - e1) / this._matrix[0];
     const f1 = this._matrix[5], y1 = y, y2 = y1;
     const f = (y2 - d * (y1 - f1) - f1) / this._matrix[3];
-    Utils.Matrix2D.multiply(this._matrix,Array.from([a, 0, 0, d, e, f]))
-    this.clearTransform()
+    Utils.Matrix2D.multiply(this._matrix, Array.from([a, 0, 0, d, e, f]))
+    this.initTransform()
   }
-  clearTransform(){
-    this._ctx.save();
-    this._ctx.setTransform(1, 0, 0, 1, 0, 0);
-    this._ctx.fillStyle = "#000000";
-    this._ctx.fillRect(-1, -1, this.width+2, this.height+2);
-    this._ctx.restore()
-    this.updateVisualBound()
+  clearOutTransform() {
+    this._ctx.fillStyle = "#010101";
+    this.initTransform()
+    // const screenBound: Bound = this._screenBound
+    // this._ctx.fillRect(0, 0, screenBound.xmin, this.height);
+    // this._ctx.fillRect(0, 0, this.width, screenBound.ymin);
+    // this._ctx.fillRect(screenBound.xmax, 0, this.width, this.height);
+    // this._ctx.fillRect(0, screenBound.ymax, this.width, this.height);
   }
-  lngLat2Project(lngLat: number[]): number[]{
+  clearRect() {
+    Utils.Canvas2D.clearRect(this._ctx, 0, 0, this.width, this.height);
+  }
+  initTransform() {
+    this._ctx.fillStyle = "#010101";
+    this._ctx.fillRect(0, 0, this.width, this.height);
+    this.updateVisualBound();
+  }
+  lngLat2Project(lngLat: number[]): number[] {
     return this._projection.project(lngLat)
   }
-  project2LngLat(coordinate: number[]): number[]{
+  project2LngLat(coordinate: number[]): number[] {
     return this._projection.unproject(coordinate)
   }
-  project2screen(coordinate: number[]): number[]{
-    return Utils.Matrix2D.transform(this._matrix,coordinate)
+  project2screen(coordinate: number[]): number[] {
+    return Utils.Matrix2D.transform(this._matrix, coordinate)
   }
-  screen2project(pixel: number[]): number[]{
-    return Utils.Matrix2D.invertTransform(this._matrix,pixel)
+  screen2project(pixel: number[]): number[] {
+    return Utils.Matrix2D.invertTransform(this._matrix, pixel)
   }
-  lngLat2screen(lngLat: number[]): number[]{
+  lngLat2screen(lngLat: number[]): number[] {
     return this.project2screen(this.lngLat2Project(lngLat))
   }
-  screen2lngLat(pixel: number[]): number[]{
+  screen2lngLat(pixel: number[]): number[] {
     return this.project2LngLat(this.screen2project(pixel))
   }
-  get default():Array<number> { return Utils.Matrix2D.setFromArray(new Array(),this._default); }
-  get tileZoom(): number{ return this._tileZoom; }
-  get scale(): number{ return this._scale; }
+  get default(): Array<number> { return Utils.Matrix2D.setFromArray(new Array(), this._default) }
+  get tileZoom(): number { return this._tileZoom }
+  get scale(): number { return this._scale }
+
   get projection(): Projection { return this._projection; }
   set projection(projection: Projection) { this._projection = projection; }
   zoomScale(zoom: number) { return Math.pow(2, zoom); }
   scaleZoom(scale: number) { return Math.log(scale) / Math.LN2; }
   updateVisualBound(): void {
-    const [a,b,c,d,e,f] = this._matrix
+    const [a, b, c, d, e, f] = this._matrix
     const x1 = (0 - e) / a, y1 = (0 - f) / d, x2 = (this.width - e) / a, y2 = (this.height - f) / d;
     this._vbound = new Bound(Math.min(x1, x2), Math.min(y1, y2), Math.max(x1, x2), Math.max(y1, y2));
     this._screenBound = new Bound((a * this._bound.xmin * this._bound.xscale + e),

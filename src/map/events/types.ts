@@ -3,7 +3,7 @@ import { Map } from '../main/types'
 import Event from './event';
 import ErrorEvent from './error_event';
 import Evented from './evented';
-import EventHandlerManager from './Event_handler_manager';
+import EventHandlerManager from './event_handler_manager';
 import Handler from './handler/handler';
 import MouseHandler from './handler/mouse_handler';
 import ScrollHandler from './handler/scroll_handler';
@@ -26,8 +26,9 @@ export {
 }
 
 export type HandlerResult = {
+  dragDelta?: Point,
   around?: Point | null,
   renderFrame?: Boolean,
-  targetZoom?: Point,
+  targetZoom?: number,
   originalEvent?: any
 };

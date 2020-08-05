@@ -3,6 +3,8 @@ import * as Browser from './browser'
 import * as Objects from './object'
 import * as DOM from './dom'
 import * as Math from './math'
+import * as Number from './number'
+import * as Canvas2D from './canvas2D'
 
 
 
@@ -11,5 +13,7 @@ export default {
   Browser,
   Objects,
   DOM,
-  Math
+  Math,
+  Number,
+  Canvas2D
 }

@@ -8,6 +8,9 @@ export default class Point {
   }
   get x():number{return this._x}
   get y():number{return this._y}
+  public toArray():number[]{
+    return [this._x,this._y]
+  }
   /**
    * 克隆一个新的点
    */

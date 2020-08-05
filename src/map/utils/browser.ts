@@ -25,4 +25,4 @@ export function offscreenCanvasSupported(): boolean {
   return supportsOffscreenCanvas;
 }
 
-export const now:() => number = window.performance && window.performance.now ? window.performance.now.bind(window.performance) : Date.now.bind(Date)
+export const now: () => number = window.performance && window.performance.now ? window.performance.now.bind(window.performance) : Date.now.bind(Date)
