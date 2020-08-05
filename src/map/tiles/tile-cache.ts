@@ -159,6 +159,5 @@ export default class TilesCache {
         }
       }
     }
-    return tile
   }
 }

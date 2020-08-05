@@ -184,6 +184,7 @@ class Transform {
   get default(): Array<number> { return Utils.Matrix2D.setFromArray(new Array(), this._default) }
   get tileZoom(): number { return this._tileZoom }
   get scale(): number { return this._scale }
+
   get projection(): Projection { return this._projection; }
   set projection(projection: Projection) { this._projection = projection; }
   zoomScale(zoom: number) { return Math.pow(2, zoom); }

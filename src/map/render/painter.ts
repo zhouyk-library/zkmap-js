@@ -40,6 +40,9 @@ export default class Painter {
       }
     }
     this._tilesCache.clearNoneTiles(this._transform.zoomInt)
+    this.viewImages = this.viewImages.filter((keys: string) => { 
+      return this.viewImages.includes(keys);
+    })
   }
 
   render() {
@@ -75,14 +78,6 @@ export default class Painter {
       this._ctx.globalAlpha = alpha;
     }
   }
-
-  getTileOpacity(tile: Tile) {
-    if (!tile.time) {
-        return 1;
-    }
-    return Math.min(1, (Utils.Browser.now() - tile.time) / (1000 / 60 * 10));
-  }
-
   renderTile(tile: Tile) {
     console.log('backf:' + tile.key);
     const screenBound: Bound = this._transform.screenBound;
@@ -103,5 +98,11 @@ export default class Painter {
     ctx.fillText(`(${z},${x},${y})`, screenX + width / 2 - 100, screenY + width / 2 - 15, 200);
     ctx.closePath();
     ctx.stroke();
+  }
+  getTileOpacity(tile:Tile) {
+    if (!tile.time) {
+        return 1;
+    }
+    return Math.min(1, (Utils.Browser.now() - tile.time) / (1000 / 60 * 10));
   }
 }
