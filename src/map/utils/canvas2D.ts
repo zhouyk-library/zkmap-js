@@ -1,32 +1,32 @@
 import Utils from './index'
 
-export function createCanvas(width:number, height:number, canvasClass?:any) :HTMLCanvasElement {
+export function createCanvas(width: number, height: number, canvasClass?: any): HTMLCanvasElement {
   let canvas;
   if (!canvasClass) {
-      canvas = Utils.DOM.create('canvas');
-      canvas.width = width;
-      canvas.height = height;
+    canvas = Utils.DOM.create('canvas');
+    canvas.width = width;
+    canvas.height = height;
   } else {
-      canvas = new canvasClass(width, height);
+    canvas = new canvasClass(width, height);
   }
   return canvas;
 }
 
-export function clearRect(ctx:CanvasRenderingContext2D, x: number, y: number, w: number, h: number) :void {
+export function clearRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
   ctx.clearRect(x, y, w, h);
 }
 
-export function image(ctx:CanvasRenderingContext2D, img:CanvasImageSource, x:number, y:number, width:number, height:number) {
+export function image(ctx: CanvasRenderingContext2D, img: CanvasImageSource, x: number, y: number, width: number, height: number) {
   try {
-      if (Utils.Number.isNumber(width) && Utils.Number.isNumber(height)) {
-          ctx.drawImage(img, x, y, width, height);
-      } else {
-          ctx.drawImage(img, x, y);
-      }
+    if (Utils.Number.isNumber(width) && Utils.Number.isNumber(height)) {
+      ctx.drawImage(img, x, y, width, height);
+    } else {
+      ctx.drawImage(img, x, y);
+    }
   } catch (error) {
-      if (console) {
-          console.warn('error when drawing image on canvas:', error);
-          console.warn(img);
-      }
+    if (console) {
+      console.warn('error when drawing image on canvas:', error);
+      console.warn(img);
+    }
   }
 }

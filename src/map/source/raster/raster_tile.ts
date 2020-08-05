@@ -62,8 +62,14 @@ export default class RasterTile implements Tile {
   }
   load(): RasterTile {
     this._controller = new window.AbortController()
+    const myHeaders = new Headers();
+    myHeaders.append("Connection", "keep-alive");
+    myHeaders.append("Accept", "*/*");
+    myHeaders.append("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
     const request = new window.Request(this._url, {
       method: 'GET',
+      headers: myHeaders,
+      redirect: 'follow',
       mode: 'cors',
       signal: this._controller.signal
     });
