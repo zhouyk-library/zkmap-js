@@ -33,15 +33,15 @@ export default class RasterLayer implements ILayer {
     return this
   }
   drawImageOpacity(tile: Tile) {
-    const opacity = tile.isLoaded ? this.getTileOpacity(tile) : 0
-    const alpha = this._ctx.globalAlpha;
-    if (opacity < 1) {
-      this._ctx.globalAlpha = opacity;
-    }
+    // const opacity = tile.isLoaded ? this.getTileOpacity(tile) : 0
+    // const alpha = this._ctx.globalAlpha;
+    // if (opacity < 1) {
+    //   this._ctx.globalAlpha = opacity;
+    // }
     this._ctx.drawImage(tile.image, tile.dx, tile.dy, tile.dw, tile.dh);
-    if (this._ctx.globalAlpha !== alpha) {
-      this._ctx.globalAlpha = alpha;
-    }
+    // if (this._ctx.globalAlpha !== alpha) {
+    //   this._ctx.globalAlpha = alpha;
+    // }
   }
   getTileOpacity(tile: Tile) {
     if (!tile.time) {
