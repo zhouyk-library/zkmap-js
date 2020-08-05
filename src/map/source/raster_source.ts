@@ -43,17 +43,17 @@ export default class RasterSource implements ISource {
     for (let x = xstart; x < xend; x++) {
       for (let y = ystart; y < yend; y++) {
         const url = this._url.getUrl(z, x, y)
-        if (this._mapLoadingTile.has(url)) {
-          lstLoadingTile.push(url)
-          continue;
-        }
         const size = this._tileSize * Math.pow(2, transform.zoom - z)
         const screenX = x * size + inXStart;
         const screenY = y * size + inYStart;
-        if (this._tilesCache.has(url)) {
+        var raster: RasterTile = null;
+        if (this._mapLoadingTile.has(url)) {
+          raster = this._mapLoadingTile.get(url)
+          lstLoadingTile.push(url)
+        }else if (this._tilesCache.has(url)) {
           this._lstCurTile.push(this.setTilesTransfrom(<RasterTile>this._tilesCache.get(url), screenX, screenY, size))
         } else {
-          const raster: RasterTile = new RasterTile(z, x, y, url).load().then((tile: Tile) => {
+          raster = new RasterTile(z, x, y, url).load().then((tile: Tile) => {
             this._tilesCache.add(tile)
             this._mapLoadingTile.delete(tile.id)
           }).error((tile: Tile) => {
@@ -63,6 +63,8 @@ export default class RasterSource implements ISource {
           this.setTilesTransfrom(raster, screenX, screenY, size)
           this._mapLoadingTile.set(raster.id, raster)
           lstLoadingTile.push(raster.id)
+        }
+        if(raster){
           this._findParentTile(raster).forEach(item => {
             if (!lstParentTile.includes(item.id)) {
               lstParentTile.push(item.id)
@@ -85,9 +87,9 @@ export default class RasterSource implements ISource {
       }
     })
     return {
-      tile_cur: this._lstCurTile,
-      tile_parent: this._lstParentTile,
-      tile_child: this._lstChildTile
+      tile_cur: this._lstCurTile.slice(),
+      tile_parent: this._lstParentTile.slice(),
+      tile_child: this._lstChildTile.slice()
     }
   }
   private setRasterTileTransfrom(raster: RasterTile, transform: Transform, inXStart: number, inYStart: number): RasterTile {
@@ -112,7 +114,7 @@ export default class RasterSource implements ISource {
         if (zoom >= 0) {
           const y1 = Math.floor(y / Math.pow(2, index))
           const x1 = Math.floor(x / Math.pow(2, index))
-          const url: string = this._url.getUrl(z, x1, y1)
+          const url: string = this._url.getUrl(zoom, x1, y1)
           if (this._tilesCache.has(url)) {
             const rasterTile: RasterTile = <RasterTile>this._tilesCache.get(url)
             rasterTiles.push(rasterTile)
