@@ -50,7 +50,7 @@ export default class RasterSource implements ISource {
         if (this._mapLoadingTile.has(url)) {
           raster = this._mapLoadingTile.get(url)
           lstLoadingTile.push(url)
-        }else if (this._tilesCache.has(url)) {
+        } else if (this._tilesCache.has(url)) {
           this._lstCurTile.push(this.setTilesTransfrom(<RasterTile>this._tilesCache.get(url), screenX, screenY, size))
         } else {
           raster = new RasterTile(z, x, y, url).load().then((tile: Tile) => {
@@ -64,19 +64,17 @@ export default class RasterSource implements ISource {
           this._mapLoadingTile.set(raster.id, raster)
           lstLoadingTile.push(raster.id)
         }
-        if(raster){
-          this._findParentTile(raster).forEach(item => {
-            if (!lstParentTile.includes(item.id)) {
-              lstParentTile.push(item.id)
-              this.setRasterTileTransfrom(item, transform, inXStart, inYStart)
-              this._lstParentTile.push(item)
-            }
-          })
-          this._findChildTiles(raster).forEach(item => {
+        this._findParentTile(raster).forEach(item => {
+          if (!lstParentTile.includes(item.id)) {
+            lstParentTile.push(item.id)
             this.setRasterTileTransfrom(item, transform, inXStart, inYStart)
-            this._lstChildTile.push(item)
-          })
-        }
+            this._lstParentTile.push(item)
+          }
+        })
+        this._findChildTiles(raster).forEach(item => {
+          this.setRasterTileTransfrom(item, transform, inXStart, inYStart)
+          this._lstChildTile.push(item)
+        })
       }
     }
 
@@ -88,7 +86,7 @@ export default class RasterSource implements ISource {
     })
     return {
       tile_cur: this._lstCurTile.slice(),
-      tile_parent: this._lstParentTile.slice(),
+      tile_parent: this._lstParentTile.slice().sort(function (a: RasterTile, b: RasterTile) { return a.z - b.z }),
       tile_child: this._lstChildTile.slice()
     }
   }

@@ -147,7 +147,7 @@ class Transform {
     this.initTransform()
   }
   clearOutTransform() {
-    this._ctx.fillStyle = "#010101";
+    // this._ctx.fillStyle = "#010101";
     this.initTransform()
     // const screenBound: Bound = this._screenBound
     // this._ctx.fillRect(0, 0, screenBound.xmin, this.height);
@@ -159,7 +159,8 @@ class Transform {
     Utils.Canvas2D.clearRect(this._ctx, 0, 0, this.width, this.height);
   }
   initTransform() {
-    this._ctx.fillStyle = "#010101";
+    // this._ctx.fillStyle = "#010101";
+    this._ctx.fillStyle = "#ffffff";
     this._ctx.fillRect(0, 0, this.width, this.height);
     this.updateVisualBound();
   }

@@ -22,6 +22,7 @@ export default class RasterLayer implements ILayer {
     Utils.Canvas2D.clearRect(this._ctx, 0, 0, this._transform.width, this._transform.height);
     const screenBound: Bound = this._transform.screenBound
     const sourceResult: SourceResult = source.getData(this._transform, screenBound)
+    console.log(sourceResult.tile_child);
     this.drawImages(sourceResult.tile_parent)
       .drawImages(sourceResult.tile_child)
       .drawImages(sourceResult.tile_cur)
@@ -33,15 +34,15 @@ export default class RasterLayer implements ILayer {
     return this
   }
   drawImageOpacity(tile: Tile) {
-    // const opacity = tile.isLoaded ? this.getTileOpacity(tile) : 0
-    // const alpha = this._ctx.globalAlpha;
-    // if (opacity < 1) {
-    //   this._ctx.globalAlpha = opacity;
-    // }
+    const opacity = tile.isLoaded ? this.getTileOpacity(tile) : 0
+    const alpha = this._ctx.globalAlpha;
+    if (opacity < 1) {
+      this._ctx.globalAlpha = opacity;
+    }
     this._ctx.drawImage(tile.image, tile.dx, tile.dy, tile.dw, tile.dh);
-    // if (this._ctx.globalAlpha !== alpha) {
-    //   this._ctx.globalAlpha = alpha;
-    // }
+    if (this._ctx.globalAlpha !== alpha) {
+      this._ctx.globalAlpha = alpha;
+    }
   }
   getTileOpacity(tile: Tile) {
     if (!tile.time) {
