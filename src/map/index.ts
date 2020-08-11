@@ -1,27 +1,27 @@
 import Map from './main/map'
 
 export default {
-  map:new Map({
-    container:"app",
-    type:'2d',
-    source:[
+  map: new Map({
+    container: "app",
+    type: '2d',
+    source: [
       {
-        id:'sourceId',
-        type:'raster',
-        url:'http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}',
-        scheme:'xyz'
+        id: 'sourceId',
+        type: 'raster',
+        url: 'http://webrd01.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scale=1&style=8',
+        scheme: 'xyz'
       }
     ],
-    layer:[
+    layer: [
       {
-        id:'layerId',
-        type:'raster',
-        source:'sourceId',
+        id: 'layerId',
+        type: 'raster',
+        source: 'sourceId',
       },
       {
-        id:'rasterdebuggerId',
-        type:'rasterdebugger',
-        source:'debugger'
+        id: 'rasterdebuggerId',
+        type: 'rasterdebugger',
+        source: 'debugger'
       }
     ]
   })
