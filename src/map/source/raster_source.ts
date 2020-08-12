@@ -38,6 +38,7 @@ export default class RasterSource implements ISource {
     this._lstCurTile.splice(0)
     const lstChildTile: Array<RasterTile> = new Array<RasterTile>()
     const lstParentTile: Array<RasterTile> = new Array<RasterTile>()
+    const lstToLoadTile: Array<RasterTile> = new Array<RasterTile>()
     const lstParentTileKey = new Array<string>()
     const lstLoadingTile: Array<String> = new Array<String>()
     for (let x = xstart; x < xend; x++) {
@@ -53,13 +54,8 @@ export default class RasterSource implements ISource {
         } else if (this._tilesCache.has(url)) {
           this._lstCurTile.push(this.setTilesTransfrom(<RasterTile>this._tilesCache.get(url), screenX, screenY, size))
         } else {
-          raster = new RasterTile(z, x, y, url).load().then((tile: Tile) => {
-            this._tilesCache.add(tile)
-            this._mapLoadingTile.delete(tile.id)
-          }).error((tile: Tile) => {
-            this._mapLoadingTile.delete(tile.id)
-            tile.destroy()
-          })
+          raster = new RasterTile(z, x, y, url)
+          lstToLoadTile.push(raster)
           this.setTilesTransfrom(raster, screenX, screenY, size)
           this._mapLoadingTile.set(raster.id, raster)
           lstLoadingTile.push(raster.id)
@@ -93,10 +89,19 @@ export default class RasterSource implements ISource {
       this._lstChildTile = lstChildTile
     }
     this._lstParentTile.forEach((tiles=>{
-      return this.setRasterTileTransfrom(tiles, transform, inXStart, inYStart)
+      this.setRasterTileTransfrom(tiles, transform, inXStart, inYStart)
     }))
     this._lstChildTile.forEach((tiles=>{
-      return this.setRasterTileTransfrom(tiles, transform, inXStart, inYStart)
+      this.setRasterTileTransfrom(tiles, transform, inXStart, inYStart)
+    }))
+    lstToLoadTile.forEach((tiles=>{
+      tiles.load().then((tile: Tile) => {
+        this._tilesCache.add(tile)
+        this._mapLoadingTile.delete(tile.id)
+      }).error((tile: Tile) => {
+        this._mapLoadingTile.delete(tile.id)
+        tile.destroy()
+      })
     }))
     return {
       tile_cur: this._lstCurTile.slice(),
