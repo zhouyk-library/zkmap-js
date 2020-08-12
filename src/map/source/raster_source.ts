@@ -36,9 +36,9 @@ export default class RasterSource implements ISource {
     const ystart = Math.floor(allCount / countY * (Math.max(inYStart, outYStart) - inYStart))
     const yend = Math.ceil(allCount / countY * (Math.min(inYEnd, outYEnd) - inYStart))
     this._lstCurTile.splice(0)
-    this._lstParentTile.splice(0)
-    this._lstChildTile.splice(0)
-    const lstParentTile = new Array<string>()
+    const lstChildTile: Array<RasterTile> = new Array<RasterTile>()
+    const lstParentTile: Array<RasterTile> = new Array<RasterTile>()
+    const lstParentTileKey = new Array<string>()
     const lstLoadingTile: Array<String> = new Array<String>()
     for (let x = xstart; x < xend; x++) {
       for (let y = ystart; y < yend; y++) {
@@ -65,15 +65,13 @@ export default class RasterSource implements ISource {
           lstLoadingTile.push(raster.id)
         }
         this._findParentTile(raster).forEach(item => {
-          if (!lstParentTile.includes(item.id)) {
-            lstParentTile.push(item.id)
-            this.setRasterTileTransfrom(item, transform, inXStart, inYStart)
-            this._lstParentTile.push(item)
+          if (!lstParentTileKey.includes(item.id)) {
+            lstParentTileKey.push(item.id)
+            lstParentTile.push(item)
           }
         })
         this._findChildTiles(raster).forEach(item => {
-          this.setRasterTileTransfrom(item, transform, inXStart, inYStart)
-          this._lstChildTile.push(item)
+          lstChildTile.push(item)
         })
       }
     }
@@ -84,6 +82,22 @@ export default class RasterSource implements ISource {
         this._mapLoadingTile.delete(tileId)
       }
     })
+    if(this._mapLoadingTile.size === 0){
+      this._lstChildTile.splice(0)
+      this._lstParentTile.splice(0)
+    }
+    if(lstParentTile.length>0){
+      this._lstParentTile = lstParentTile
+    }
+    if(lstChildTile.length>0){
+      this._lstChildTile = lstChildTile
+    }
+    this._lstParentTile.forEach((tiles=>{
+      return this.setRasterTileTransfrom(tiles, transform, inXStart, inYStart)
+    }))
+    this._lstChildTile.forEach((tiles=>{
+      return this.setRasterTileTransfrom(tiles, transform, inXStart, inYStart)
+    }))
     return {
       tile_cur: this._lstCurTile.slice(),
       tile_parent: this._lstParentTile.slice().sort(function (a: RasterTile, b: RasterTile) { return a.z - b.z }),
