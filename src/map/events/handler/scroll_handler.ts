@@ -21,6 +21,7 @@ export default class ScrollHandler implements Handler {
     this._map = map;
     this._handler = handler;
     this._delta = 0
+    this._targetZoom = this._map.transform.zoom
   }
   enable(): void {
     if (this.isEnabled()) return;
@@ -58,13 +59,16 @@ export default class ScrollHandler implements Handler {
   _onScrollFrame(): HandlerResult {
     if (!this.isActive()) return;
     const tr = this._map.transform;
+    console.log(this._delta);
     if (this._delta !== 0) {
       let scale = this._delta / 100
-      this._targetZoom = Math.min(tr.maxZoom, Math.max(tr.minZoom, tr.zoom + scale));
+      this._targetZoom = Math.min(tr.maxZoom, Math.max(tr.minZoom, this._targetZoom + scale));
       this._startZoom = tr.zoom;
       this._easing = this._smoothOutEasing(200);
       this._delta = 0;
     }
+    console.log(this._targetZoom);
+    
     const targetZoom = typeof this._targetZoom === 'number' ? this._targetZoom : tr.zoom;
     const startZoom = this._startZoom;
     const easing = this._easing;
@@ -74,8 +78,9 @@ export default class ScrollHandler implements Handler {
     if (startZoom && easing) {
       const t = Math.min((Utils.Browser.now() - this._lastEventTime) / 200, 1);
       const k = easing(t);
-      zoom = (targetZoom - startZoom) * k + startZoom + 0.00000001;
+      zoom = (targetZoom - startZoom) * k + startZoom;
       if (t >= 1) {
+        zoom = targetZoom;
         finished = true;
       }
     } else {
