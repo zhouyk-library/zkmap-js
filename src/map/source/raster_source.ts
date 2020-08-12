@@ -78,23 +78,23 @@ export default class RasterSource implements ISource {
         this._mapLoadingTile.delete(tileId)
       }
     })
-    if(this._mapLoadingTile.size === 0){
+    if (this._mapLoadingTile.size === 0) {
       this._lstChildTile.splice(0)
       this._lstParentTile.splice(0)
     }
-    if(lstParentTile.length>0){
+    if (lstParentTile.length > 0) {
       this._lstParentTile = lstParentTile
     }
-    if(lstChildTile.length>0){
+    if (lstChildTile.length > 0) {
       this._lstChildTile = lstChildTile
     }
-    this._lstParentTile.forEach((tiles=>{
+    this._lstParentTile.forEach((tiles => {
       this.setRasterTileTransfrom(tiles, transform, inXStart, inYStart)
     }))
-    this._lstChildTile.forEach((tiles=>{
+    this._lstChildTile.forEach((tiles => {
       this.setRasterTileTransfrom(tiles, transform, inXStart, inYStart)
     }))
-    lstToLoadTile.forEach((tiles=>{
+    lstToLoadTile.forEach((tiles => {
       tiles.load().then((tile: Tile) => {
         this._tilesCache.add(tile)
         this._mapLoadingTile.delete(tile.id)
@@ -126,7 +126,7 @@ export default class RasterSource implements ISource {
     const rasterTiles: RasterTile[] = []
     if (raster) {
       const { z, x, y } = raster
-      for (let index = 1; index < 6; index++) {
+      for (let index = 1; index < 2; index++) {
         const zoom = z - index
         if (zoom >= 0) {
           const y1 = Math.floor(y / Math.pow(2, index))
