@@ -23,9 +23,21 @@ export default class UnitBezier3{
     // ay t^3 + by t^2 + cy t
     return ((this.ay * t + this.by) * t + this.cy) * t;
   }
-  private solveCurveX(t:number):number{
+  private sampleCurveDerivativeX(t:number):number {
+    return (3.0 * this.ax * t + 2.0 * this.bx) * t + this.cx;
+  }
+  private solveCurveX(t:number,epsilon?:number):number{
+    if (typeof epsilon === 'undefined') epsilon = 1e-6;
+    var t0,t1,t2,x2,i;
+    for (t2 = t, i = 0; i < 8; i++) {
+        x2 = this.sampleCurveX(t2) - t;
+        if (Math.abs(x2) < epsilon) return t2;
+        var d2 = this.sampleCurveDerivativeX(t2);
+        if (Math.abs(d2) < 1e-6) break;
+        t2 = t2 - x2 / d2;
+    }
+    
     // 二分法求贝塞尔值
-    var t0 = 0.0,t1 = 1.0,t2 = t,x2;
     if (t2 < t0) return t0;
     if (t2 > t1) return t1;
     while (t0 < t1) {
