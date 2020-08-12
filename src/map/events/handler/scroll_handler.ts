@@ -59,7 +59,6 @@ export default class ScrollHandler implements Handler {
   _onScrollFrame(): HandlerResult {
     if (!this.isActive()) return;
     const tr = this._map.transform;
-    console.log(this._delta);
     if (this._delta !== 0) {
       let scale = this._delta / 100
       this._targetZoom = Math.min(tr.maxZoom, Math.max(tr.minZoom, this._targetZoom + scale));
@@ -67,7 +66,6 @@ export default class ScrollHandler implements Handler {
       this._easing = this._smoothOutEasing(200);
       this._delta = 0;
     }
-    console.log(this._targetZoom);
     
     const targetZoom = typeof this._targetZoom === 'number' ? this._targetZoom : tr.zoom;
     const startZoom = this._startZoom;
