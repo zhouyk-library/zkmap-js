@@ -25,8 +25,11 @@ export default class RasterSource implements ISource {
   }
   refresh(): void { }
   getData(transform: Transform, bound: Bound): SourceResult {
+    const projectBound: Bound = transform.bound
+    const projectVBound: Bound = transform.VBound
     const z = transform.zoomInt
     const allCount = Math.pow(2, z)
+    const tilwsProj: number = Math.abs(projectBound.xmax - projectBound.xmin) / allCount
     const outXEnd = transform.width, outXStart = 0, outYEnd = transform.height, outYStart = 0
     const inXStart = bound.xmin, inYStart = bound.ymin, inXEnd = bound.xmax, inYEnd = bound.ymax
     const countX = inXEnd - inXStart
