@@ -10,6 +10,7 @@ export default class RasterSource implements ISource {
   private _lstCurTile: Array<RasterTile>;
   private _url: URL;
   private _tileSize: number = 256;
+  private resolutions: number[] = [];
   constructor(option: SourceOption) {
     this._id = option.id
     this._url = new URL(option.url, option.scheme)
@@ -19,17 +20,19 @@ export default class RasterSource implements ISource {
     this._lstParentTile = new Array<RasterTile>()
     this._lstChildTile = new Array<RasterTile>()
     this._lstCurTile = new Array<RasterTile>()
+    const d = 2 * 6378137 * Math.PI;
+    for (let i = 0; i < 23; i++) {
+      this.resolutions[i] = d / (256 * Math.pow(2, i));
+    }
   }
   get id(): String {
     return this._id;
   }
   refresh(): void { }
   getData(transform: Transform, bound: Bound): SourceResult {
-    const projectBound: Bound = transform.bound
-    const projectVBound: Bound = transform.VBound
+    const tileViewBound: Bound = this.getTileViewBound(transform)
     const z = transform.zoomInt
     const allCount = Math.pow(2, z)
-    const tilwsProj: number = Math.abs(projectBound.xmax - projectBound.xmin) / allCount
     const outXEnd = transform.width, outXStart = 0, outYEnd = transform.height, outYStart = 0
     const inXStart = bound.xmin, inYStart = bound.ymin, inXEnd = bound.xmax, inYEnd = bound.ymax
     const countX = inXEnd - inXStart
@@ -111,6 +114,16 @@ export default class RasterSource implements ISource {
       tile_parent: this._lstParentTile.slice().sort(function (a: RasterTile, b: RasterTile) { return a.z - b.z }),
       tile_child: this._lstChildTile.slice()
     }
+  }
+  private getTileViewBound(transform: Transform): Bound {
+    const projectBound: Bound = transform.bound
+    const projectVBound: Bound = transform.VBound
+    transform.center
+    const z = transform.zoomInt
+    const allCount = Math.pow(2, z)
+    const tilwsProj: number = Math.abs(projectBound.xmax - projectBound.xmin) / allCount
+    return projectVBound;
+
   }
   private setRasterTileTransfrom(raster: RasterTile, transform: Transform, inXStart: number, inYStart: number): RasterTile {
     const size = this._tileSize * Math.pow(2, transform.zoom - raster.z)
