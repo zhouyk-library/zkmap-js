@@ -22,7 +22,7 @@ export default class RasterSource implements ISource {
     this._lstCurTile = new Array<RasterTile>()
     const d = 2 * 6378137 * Math.PI;
     for (let i = 0; i < 23; i++) {
-      this.resolutions[i] = d / (256 * Math.pow(2, i));
+      this.resolutions[i] = d / (Math.pow(2, i));
     }
   }
   get id(): String {
@@ -116,14 +116,16 @@ export default class RasterSource implements ISource {
     }
   }
   private getTileViewBound(transform: Transform): Bound {
-    const projectBound: Bound = transform.bound
-    const projectVBound: Bound = transform.VBound
-    transform.center
     const z = transform.zoomInt
-    const allCount = Math.pow(2, z)
-    const tilwsProj: number = Math.abs(projectBound.xmax - projectBound.xmin) / allCount
+    const projLength: number = 2 * 6378137 * Math.PI
+    const projectVBound: Bound = transform.VBound
+    const res: number = projLength / (Math.pow(2, z))
+    const x1: number = Math.floor(projectVBound.xmin % projLength / res)
+    const y1: number = Math.floor(projectVBound.ymin % projLength / res)
+    const x2: number = Math.floor(projectVBound.xmax % projLength / res)
+    const y2: number = Math.floor(projectVBound.ymax % projLength / res)
+    console.log({ x1, y1, x2, y2 });
     return projectVBound;
-
   }
   private setRasterTileTransfrom(raster: RasterTile, transform: Transform, inXStart: number, inYStart: number): RasterTile {
     const size = this._tileSize * Math.pow(2, transform.zoom - raster.z)
