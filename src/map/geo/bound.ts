@@ -24,7 +24,12 @@ export default class Bound {
   get yscale():number {
       return this._yscale;
   }
-
+  containX(x:number):boolean{
+    return this._xmin * this._xscale <= x && this._xmax * this._xscale >= x;
+  }
+  containY(y:number):boolean{
+    return this._ymin * this._xscale <= y && this._ymax * this._xscale >= y;
+  }
   constructor(xmin, ymin, xmax, ymax) {
       this._xmin = Math.min(xmin, xmax);
       this._ymin = Math.min(ymin, ymax);

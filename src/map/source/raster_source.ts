@@ -119,6 +119,7 @@ export default class RasterSource implements ISource {
     const z = transform.zoomInt
     const projLength: number = 2 * 6378137 * Math.PI
     const projectVBound: Bound = transform.VBound
+    const bound: Bound = transform.bound
     const res: number = projLength / (Math.pow(2, z))
     const x1: number = Math.floor(projectVBound.xmin % projLength / res)
     const y1: number = Math.floor(projectVBound.ymin % projLength / res)
@@ -126,6 +127,9 @@ export default class RasterSource implements ISource {
     const y2: number = Math.floor(projectVBound.ymax % projLength / res)
     console.log({ x1, y1, x2, y2 });
     return projectVBound;
+  }
+  private absProjectNumber(bound){
+    
   }
   private setRasterTileTransfrom(raster: RasterTile, transform: Transform, inXStart: number, inYStart: number): RasterTile {
     const size = this._tileSize * Math.pow(2, transform.zoom - raster.z)
