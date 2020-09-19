@@ -8,7 +8,9 @@ export enum TileState { NONE = 0, LOADING = 2, OK = 1, ERROR = -1 }
 export type SourceResult = {
   tile_cur?: Tile[],
   tile_parent?: Tile[],
-  tile_child?: Tile[]
+  tile_child?: Tile[],
+  coordinates?: number[][],
+  bound?: Bound
 }
 
 export interface Tile {

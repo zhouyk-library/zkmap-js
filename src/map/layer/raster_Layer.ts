@@ -22,7 +22,7 @@ export default class RasterLayer implements ILayer {
     Utils.Canvas2D.clearRect(this._ctx, 0, 0, this._transform.width, this._transform.height);
     const screenBound: Bound = this._transform.screenBound
     const sourceResult: SourceResult = source.getData(this._transform, screenBound)
-    
+
     this.drawImages(sourceResult.tile_parent)
       .drawImages(sourceResult.tile_child)
       .drawImages(sourceResult.tile_cur)
@@ -50,11 +50,8 @@ export default class RasterLayer implements ILayer {
     }
     return Math.min(1, (Utils.Browser.now() - tile.time) / (1000 / 60 * 10));
   }
-  getImage(): HTMLCanvasElement {
-    return this._canvas
-  }
   draw(): void {
-    this._transform.context.ctx.drawImage(this.getImage(), 0, 0, this._transform.width, this._transform.height)
+    this._transform.context.ctx.drawImage(this._canvas, 0, 0, this._transform.width, this._transform.height)
   }
   getSourceId(): string {
     return this._sourceId;

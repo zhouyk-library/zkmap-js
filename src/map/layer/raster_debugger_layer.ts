@@ -1,5 +1,5 @@
-import {ILayer,LayerOption} from './types'
-import {ISource,SourceResult,Tile} from '../source/types'
+import { ILayer, LayerOption } from './types'
+import { ISource, SourceResult, Tile } from '../source/types'
 import Utils from '../utils'
 import { Transform, Bound } from '../geo/types';
 export default class RasterDebuggerLayer implements ILayer {
@@ -8,17 +8,17 @@ export default class RasterDebuggerLayer implements ILayer {
   private _transform: Transform;
   private _sourceId: string;
   private _canvas: HTMLCanvasElement;
-  private _ctx:CanvasRenderingContext2D
-  constructor(option:LayerOption,transform: Transform) {
+  private _ctx: CanvasRenderingContext2D
+  constructor(option: LayerOption, transform: Transform) {
     this._transform = transform
     this._id = option.id
     this._sourceId = option.source
-    const canvas = Utils.Canvas2D.createCanvas(transform.width,transform.height);
+    const canvas = Utils.Canvas2D.createCanvas(transform.width, transform.height);
     this._canvas = canvas;
     this._ctx = canvas.getContext('2d')
     this._enable = true;
   }
-  render(source:ISource): void{
+  render(source: ISource): void {
     Utils.Canvas2D.clearRect(this._ctx, 0, 0, this._transform.width, this._transform.height);
     const screenBound: Bound = this._transform.screenBound
     const allCount = Math.pow(2, this._transform.zoomInt)
@@ -30,13 +30,13 @@ export default class RasterDebuggerLayer implements ILayer {
     const xend = Math.ceil(allCount / countX * (Math.min(inXEnd, outXEnd) - inXStart))
     const ystart = Math.floor(allCount / countY * (Math.max(inYStart, outYStart) - inYStart))
     const yend = Math.ceil(allCount / countY * (Math.min(inYEnd, outYEnd) - inYStart))
-    
+
     for (let inexx = xstart; inexx < xend; inexx++) {
       for (let inexy = ystart; inexy < yend; inexy++) {
-        const width =  256 * Math.pow(2, this._transform.zoom - this._transform.zoomInt)
+        const width = 256 * Math.pow(2, this._transform.zoom - this._transform.zoomInt)
         const screenX = inexx * width + inXStart;
         const screenY = inexy * width + inYStart;
-        this.drawDebuggerRect(this._transform.zoomInt,inexx,inexy,screenX,screenY,width,this._ctx);
+        this.drawDebuggerRect(this._transform.zoomInt, inexx, inexy, screenX, screenY, width, this._ctx);
       }
     }
   }
@@ -51,28 +51,25 @@ export default class RasterDebuggerLayer implements ILayer {
     ctx.closePath();
     ctx.stroke();
   }
-  getImage(): HTMLCanvasElement{
-    return this._canvas
+  draw(): void {
+    this._transform.context.ctx.drawImage(this._canvas, 0, 0, this._transform.width, this._transform.height)
   }
-  draw():void{
-    this._transform.context.ctx.drawImage(this.getImage(),0,0, this._transform.width,this._transform.height)
-  }
-  getSourceId():string {
+  getSourceId(): string {
     return this._sourceId;
   }
-  setSourceId(sourceId :string): void {
+  setSourceId(sourceId: string): void {
     this._sourceId = sourceId
   }
-  get id():string {
+  get id(): string {
     return this._id;
   }
-  enable(): void{
+  enable(): void {
     this._enable = true
   }
-  disable(): void{
+  disable(): void {
     this._enable = false
   }
-  get isEnable(): boolean{
+  get isEnable(): boolean {
     return this._enable
   }
 }

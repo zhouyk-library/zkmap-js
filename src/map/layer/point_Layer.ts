@@ -2,29 +2,27 @@ import { ILayer, LayerOption } from './types'
 import { ISource, SourceResult } from '../source/types'
 import Utils from '../utils'
 import { Transform, Bound } from '../geo/types';
+import { Paint, Painter } from '../render/types';
 export default class PointLayer implements ILayer {
   private _enable: boolean = false;
   private _id: string;
   private _transform: Transform;
   private _sourceId: string;
-  private _canvas: HTMLCanvasElement;
-  private _ctx: CanvasRenderingContext2D
-  constructor(option: LayerOption, transform: Transform) {
+  private _paint: Paint;
+  private _painter: Painter;
+  constructor(option: LayerOption, transform: Transform, painter: Painter) {
     this._transform = transform
     this._id = option.id
+    this._paint = option.paint
     this._sourceId = option.source
-    const canvas = Utils.Canvas2D.createCanvas(transform.width, transform.height);
-    this._canvas = canvas;
-    this._ctx = canvas.getContext('2d')
     this._enable = true;
+    this._painter = painter;
   }
   render(source: ISource): void {
-  }
-  getImage(): HTMLCanvasElement {
-    return this._canvas
+    const { coordinates } = source.getData(this._transform, this._transform.screenBound)
+    this._painter.draw(this._paint, coordinates)
   }
   draw(): void {
-    this._transform.context.ctx.drawImage(this.getImage(), 0, 0, this._transform.width, this._transform.height)
   }
   getSourceId(): string {
     return this._sourceId;

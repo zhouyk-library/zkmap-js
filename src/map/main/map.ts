@@ -5,9 +5,9 @@ import { Sources, SourceOption } from '../source/types';
 import { Layers, ILayer, LayerOption } from '../layer/types';
 import { Cancelable } from '../utils/types';
 import { Transform } from '../geo/types';
-import { Render } from '../render/types';
 import { TaskQueue, TaskID } from '../queue/types';
 import { URL } from '../com/types';
+import { Painter } from '../render/types';
 import Utils from '../utils'
 
 class Map extends Camera {
@@ -15,13 +15,13 @@ class Map extends Camera {
   private _canvas: HTMLCanvasElement;
   private _sources: Sources;
   private _layers: Layers;
-  _render: Render;
   private _animationFrame: Cancelable;
   private _options: MapOptions;
   private _url: URL;
   private _renderTaskQueue: TaskQueue;
   private _canvasContainer: HTMLElement;
   private _eventHandlerManager: EventHandlerManager;
+  _painter: Painter
   constructor(options?: MapOptions) {
     if (options.minZoom != null && options.maxZoom != null && options.minZoom > options.maxZoom) {
       throw new Error(`maxZoom must be greater than or equal to minZoom`);
@@ -54,6 +54,7 @@ class Map extends Camera {
     container.appendChild(canvasContainer);
     const transform = new Transform(canvas, options.minZoom, options.maxZoom, options.type);
     super(transform);
+    this._painter = new Painter(transform.context.ctx, this)
     this._url = new URL('', '')
     this._sources = new Sources()
     this._layers = new Layers(this._sources, this)
@@ -63,7 +64,6 @@ class Map extends Camera {
     options.layer.forEach(item => {
       this.addLayer(item)
     })
-    const render = new Render(this);
     this._options = options;
     this._renderTaskQueue = new TaskQueue();
     this._canvas = canvas;
@@ -71,10 +71,8 @@ class Map extends Camera {
     this._canvasContainer = canvasContainer
     this._eventHandlerManager = new EventHandlerManager(this)
     this.resize();
-    this._render = render;
     this.triggerRepaint()
     this.on('refresh', this.triggerRepaint)
-    this._render.computed();
   }
   getUrl(z: number, x: number, y: number): string {
     return this._url.getUrl(z, x, y)
