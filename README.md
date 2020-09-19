@@ -29,15 +29,12 @@ npm run build
 > npm
 ```
 import zkmap from 'zk-map';
-
 ```
 
 
 > script
 ```
-<!-- 未发布,自行打包引入 -->
-<script type="text/javascript" src="js/zkmap.js"></script>
-
+<script type="text/javascript" src="https://zhouyk-library.github.io/js/zkmap.js"></script>
 ```
 
 
