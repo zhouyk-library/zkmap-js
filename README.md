@@ -24,6 +24,25 @@ npm run build
 
 #### 基础用法
 
+
+###### 引入
+> npm
+```
+import zkmap from 'zk-map';
+
+```
+
+
+> script
+```
+<!-- 未发布,自行打包引入 -->
+<script type="text/javascript" src="js/zkmap.js"></script>
+
+```
+
+
+###### 示例代码
+
 ```
 new zkmap.Map({
   container: "app",
